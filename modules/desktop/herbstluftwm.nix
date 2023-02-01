@@ -20,9 +20,16 @@ in {
         windowManager.herbstluftwm.enable = true;
       };
     };
+    user.packages = with pkgs; [
+      rofi
+      nitrogen
+      conky
+      polybar
+      dzen2
+    ];
 
-    home.configFile = {
-      "herbstluftwm" = {
+    home.file = {
+      ".config/herbstluftwm" = {
         source = "${configDir}/herbstluftwm";
         recursive = true;
       };
