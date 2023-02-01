@@ -26,58 +26,35 @@ with lib.my; {
 
   boot = {
     loader = {
-      grub = {
-        enable = true;
-        efiSupport = true;
-        device = "nodev";
-      };
+      grub.enable = mkDefault true;
+      grub.efiSupport = mkDefault true;
       efi = {
-        canTouchEfiVariables = true;
-        efiSysMountPoint = "/efi";
+        canTouchEfiVariables = mkDefault true;
+        efiSysMountPoint = mkDefault "/efi";
       };
     };
   };
-
-  networking = {
-    hostName = "nixos";
-    networkmanager.enable = true;
-
-    firewall = { enable = true; };
-  };
-
-  time.timeZone = "Europe/Stockholm";
-
-  i18n = {
-    defaultLocale = "en_US.UTF-8";
-    extraLocaleSettings = {
-      LC_ADDRESS = "sv_SE.UTF-8";
-      LC_IDENTIFICATION = "sv_SE.UTF-8";
-      LC_MEASUREMENT = "sv_SE.UTF-8";
-      LC_MONETARY = "sv_SE.UTF-8";
-      LC_NAME = "sv_SE.UTF-8";
-      LC_NUMERIC = "sv_SE.UTF-8";
-      LC_PAPER = "sv_SE.UTF-8";
-      LC_TELEPHONE = "sv_SE.UTF-8";
-      LC_TIME = "sv_SE.UTF-8";
-    };
-  };
-
-  #users.users.mg433 = {
-  #  isNormalUser = true;
-  #  description = "Elis Odenhage";
-  #  initialPassword = "test";
-  #  extraGroups = [ "wheel" ];
-  #};
-
   nixpkgs.config.allowUnfree = true;
 
-  environment.systemPackages = with pkgs; [ discord ];
+  ## Some reasonable, global defaults
+  # This is here to appease 'nix flake check' for generic hosts with no
+  # hardware-configuration.nix or fileSystem config.
+  fileSystems."/".device = mkDefault "/dev/disk/by-label/nixos";
 
-  services.xserver = {
-    enable = true;
-    displayManager.lightdm.enable = true;
-    desktopManager.cinnamon.enable = true;
-  };
+  # The global useDHCP flag is deprecated, therefore explicitly set to false
+  # here. Per-interface useDHCP will be mandatory in the future, so we enforce
+  # this default behavior here.
+  networking.useDHCP = mkDefault true;
 
+  # Just the bear necessities...
+  environment.systemPackages = with pkgs; [
+    bind
+    cached-nix-shell
+    git
+    vim
+    wget
+    gnumake
+    unzip
+  ];
   system.stateVersion = "22.11";
 }
