@@ -11,7 +11,6 @@ in {
   config = mkIf cfg.enable {
     services = {
       picom.enable = true;
-      redshift.enable = true;
       xserver = {
         enable = true;
         displayManager = {
