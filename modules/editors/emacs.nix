@@ -15,7 +15,7 @@ in {
       (pkgs.emacsWithPackagesFromUsePackage {
         package =
           pkgs.emacs; # replace with pkgs.emacsPgtk, or another version if desired.
-        config = "${configDir}/emacs/Emacs.org";
+        config = /. + builtins.toPath "${configDir}/emacs/Emacs.org";
         # config = path/to/your/config.org; # Org-Babel configs also supported
 
         alwaysEnsure = true;
@@ -35,7 +35,12 @@ in {
       (aspellWithDicts (ds: with ds; [ en en-computers en-science ]))
       sqlite
     ];
-    home.file.".emacs.d/" = { source = "${configDir}/emacs/init.el"; recursive = true; };
+    home.file = { 
+      ".emacs.d/init.el" = {
+        source = "${configDir}/emacs/init.el";
+         recursive = true;
+      };
+    };
     fonts.fonts = [ pkgs.emacs-all-the-icons-fonts ];
   };
 }
