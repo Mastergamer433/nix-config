@@ -5,6 +5,7 @@
   modules = {
     desktop = {
       herbstluftwm.enable = true;
+      apps = { discord.enable = true; };
     };
     editors = { emacs.enable = true; };
   };
