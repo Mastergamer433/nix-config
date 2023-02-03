@@ -5,9 +5,18 @@
   modules = {
     desktop = {
       herbstluftwm.enable = true;
-      apps = { discord.enable = true; };
+      apps = {
+        discord.enable = true;
+        polybar.enable = true;
+      };
+      term = {
+        default = "alacritty";
+        alacritty.enable = true;
+      };
     };
+
     editors = { emacs.enable = true; };
+    hardware.audio.enable = true;
   };
 
   ## Local config
@@ -42,9 +51,7 @@
       grub.enable = true;
       grub.efiSupport = false;
       grub.device = "/dev/sda";
-      efi = {
-        canTouchEfiVariables = false;
-      };
+      efi = { canTouchEfiVariables = false; };
     };
   };
 }

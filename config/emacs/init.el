@@ -40,13 +40,13 @@
 (load-theme 'doom-dracula t)
 
 ;; Set the font
-(set-face-attribute 'default nil :font "Fira Code Retina" :height 110)
+(set-face-attribute 'default nil :font "Fira Code" :height 110)
 
 ;; Set the fixed pitch face
-(set-face-attribute 'fixed-pitch nil :font "Fira Code Retina" :height 100)
+(set-face-attribute 'fixed-pitch nil :font "Fira Code" :height 100)
 
 ;; Set the variable pitch face
-(set-face-attribute 'variable-pitch nil :font "Fira Code Retina" :height 120 :weight 'regular)
+(set-face-attribute 'variable-pitch nil :font "Fira Code" :height 120 :weight 'regular)
 
 (use-package all-the-icons)
 
@@ -429,7 +429,7 @@
                   (org-level-6 . 1.1)
                   (org-level-7 . 1.1)
                   (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "Fira Code Retina" :weight 'regular :height (cdr face)))
+    (set-face-attribute (car face) nil :font "Fira Code" :weight 'regular :height (cdr face)))
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
   (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)

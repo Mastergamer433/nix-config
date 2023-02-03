@@ -78,13 +78,13 @@ I like a bounch of themes but right now i like dracula most.
 *** Set the font
 #+begin_src emacs-lisp
 ;; Set the font
-(set-face-attribute 'default nil :font "Fira Code Retina" :height 110)
+(set-face-attribute 'default nil :font "Fira Code" :height 110)
 
 ;; Set the fixed pitch face
-(set-face-attribute 'fixed-pitch nil :font "Fira Code Retina" :height 100)
+(set-face-attribute 'fixed-pitch nil :font "Fira Code" :height 100)
 
 ;; Set the variable pitch face
-(set-face-attribute 'variable-pitch nil :font "Fira Code Retina" :height 120 :weight 'regular)
+(set-face-attribute 'variable-pitch nil :font "Fira Code" :height 120 :weight 'regular)
 #+end_src
 
 *** All the icons
@@ -159,6 +159,7 @@ display-time-world command provides a nice display of the time at a specified li
 ** Preserve Minibuffer History with savehist-mode
 #+begin_src emacs-lisp
   (use-package savehist
+    :ensure nil
     :init
     (savehist-mode))
 #+end_src
@@ -377,6 +378,7 @@ display-time-world command provides a nice display of the time at a specified li
 ** Window History with winner-mode
 #+begin_src emacs-lisp
   (use-package winner
+    :ensure nil
     :after evil
     :config
     (winner-mode)
@@ -500,6 +502,7 @@ Projectile
 ** Mail
 #+begin_src emacs-lisp
   (use-package mu4e
+    :ensure nil
     :config
 
     ;; This is set to 't' to avoid mail syncing issues when using mbsync
@@ -511,31 +514,31 @@ Projectile
     (setq mu4e-maildir "~/Mail")
 
     (setq mu4e-contexts
-	  (list
-	   (make-mu4e-context
-	    :name "Private"
-	    :match-func
-	    (lambda (msg)
-	      (when msg
-		(string-prefix-p "/Gmail" (mu4e-message-field msg :maildir))))
-	    :vars '((user-mail-address . "teknikgillaren@gmail.com")
-		    (user-full-name    . "Karl Elis Odenhage")
-		    (mu4e-drafts-folder  . "/Gmail/Drafts")
-		    (mu4e-sent-folder  . "/Gmail/Sent Mail")
-		    (mu4e-refile-folder  . "/Gmail/All Mail")
-		    (mu4e-trash-folder  . "/Gmail/Trash")
-		    (smtpmail-smtp-server . "smtp.google.com")
-		    (smtpmail-smtp-service . 465)
-		    (smtpmail-stream-type . ssl)))))
+          (list
+           (make-mu4e-context
+            :name "Private"
+            :match-func
+            (lambda (msg)
+              (when msg
+                (string-prefix-p "/Gmail" (mu4e-message-field msg :maildir))))
+            :vars '((user-mail-address . "teknikgillaren@gmail.com")
+                    (user-full-name    . "Karl Elis Odenhage")
+                    (mu4e-drafts-folder  . "/Gmail/Drafts")
+                    (mu4e-sent-folder  . "/Gmail/Sent Mail")
+                    (mu4e-refile-folder  . "/Gmail/All Mail")
+                    (mu4e-trash-folder  . "/Gmail/Trash")
+                    (smtpmail-smtp-server . "smtp.google.com")
+                    (smtpmail-smtp-service . 465)
+                    (smtpmail-stream-type . ssl)))))
 
     (setq message-send-mail-function 'smtpmail-send-it)
 
     (setq mu4e-maildir-shortcuts
-	  '(("/Inbox"     . ?i)
-	    ("/Sent Mail" . ?s)
-	    ("/Trash"     . ?t)
-	    ("/Drafts"    . ?d)
-	    ("/All Mail"  . ?a))))
+          '(("/Inbox"     . ?i)
+            ("/Sent Mail" . ?s)
+            ("/Trash"     . ?t)
+            ("/Drafts"    . ?d)
+            ("/All Mail"  . ?a))))
 
 
   (use-package org-mime
@@ -561,7 +564,7 @@ Projectile
                     (org-level-6 . 1.1)
                     (org-level-7 . 1.1)
                     (org-level-8 . 1.1)))
-      (set-face-attribute (car face) nil :font "Fira Code Retina" :weight 'regular :height (cdr face)))
+      (set-face-attribute (car face) nil :font "Fira Code" :weight 'regular :height (cdr face)))
 
     ;; Ensure that anything that should be fixed-pitch in Org files appears that way
     (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)

@@ -34,6 +34,7 @@ in {
       zstd
       (aspellWithDicts (ds: with ds; [ en en-computers en-science ]))
       sqlite
+      mu
     ];
     home.file = { 
       ".emacs.d/init.el" = {
@@ -41,6 +42,6 @@ in {
          recursive = true;
       };
     };
-    fonts.fonts = [ pkgs.emacs-all-the-icons-fonts ];
+    fonts.fonts = [ pkgs.emacs-all-the-icons-fonts pkgs.fira-code ];
   };
 }

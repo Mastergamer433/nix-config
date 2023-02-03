@@ -6,6 +6,10 @@
     desktop = {
       herbstluftwm.enable = true;
       apps = { discord.enable = true; };
+      term = {
+        default = "alacritty";
+        alacritty.enable = true;
+      };
     };
     editors = { emacs.enable = true; };
   };

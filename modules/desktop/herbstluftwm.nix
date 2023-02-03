@@ -24,7 +24,6 @@ in {
       rofi
       nitrogen
       conky
-      polybar
       dzen2
     ];
 
