@@ -15,6 +15,22 @@
   };
 
   ## Local config
+  networking.wireguard.interfaces = {
+    wg0 = {
+      ips = [ "10.10.10.3/24" ];
+      listenPort = 51820;
+      privateKeyFile = config.age.secrets.wireguard.path;
+      peers = [
+        { # doomemacs
+          presharedKey = "7A7W7Whrc1SPhw4O+jOGR5Lo+zRFjS81nuOfGrKO6fs=";
+          publicKey = "Vwqi4VfktCk6alMxwdHiOcEUEPRKUkL0fvbF1TmQRAU=";
+          allowedIPs = [ "10.10.10.0/24" ];
+          endpoint = "37.123.133.36:51820";
+        }
+      ];
+    };
+  };
+
   programs.ssh.startAgent = true;
   services.openssh.startWhenNeeded = true;
 

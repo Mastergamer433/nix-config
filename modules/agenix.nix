@@ -20,9 +20,8 @@ in {
         }) (import secretsFile)
     else
       { };
-    identityPaths = options.age.identityPaths.default ++ (filter pathExists [
+    identityPaths = [
       "/home/mg433/.ssh/id_ed25519"
-      "/home/mg433/.ssh/id_rsa"
-    ]);
+    ];
   };
 }
