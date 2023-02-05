@@ -89,6 +89,7 @@
 (setq display-time-world-time-format "%a, %d %b %I:%M %p %Z")
 
 (use-package savehist
+  :ensure nil
   :init
   (savehist-mode))
 
@@ -124,6 +125,60 @@
   (vertico-cycle t)
   :init
   (vertico-mode))
+
+;; Enable Corfu completion UI
+;; See the Corfu README for more configuration tips.
+(use-package corfu
+  :bind (("TAB" . corfu-insert))
+  :custom
+  (corfu-auto t)
+  (corfu-echo-documentation nil)
+  :init
+  (global-corfu-mode))
+
+;; Disable auto completion-at-point for some modes.
+(dolist (mode '(term-mode-hook
+                shell-mode-hook
+                eshell-mode-hook
+                lsp-mode-hook))
+  (add-hook mode (lambda () (setq-local corfu-auto nil))))
+
+;; Add extensions
+(use-package cape
+  ;; Bind dedicated completion commands
+  ;; Alternative prefix keys: C-c p, M-p, M-+, ...
+  :bind (("C-c c p" . completion-at-point) ;; capf
+         ("TAB"     . completion-at-point)
+         ("C-c c t" . complete-tag)        ;; etags
+         ("C-c c d" . cape-dabbrev)        ;; or dabbrev-completion
+         ("C-c c h" . cape-history)
+         ("C-c c f" . cape-file)
+         ("C-c c k" . cape-keyword)
+         ("C-c c s" . cape-symbol)
+         ("C-c c a" . cape-abbrev)
+         ("C-c c i" . cape-ispell)
+         ("C-c c l" . cape-line)
+         ("C-c c w" . cape-dict)
+         ("C-c c \\" . cape-tex)
+         ("C-c c _" . cape-tex)
+         ("C-c c ^" . cape-tex)
+         ("C-c c &" . cape-sgml)
+         ("C-c c r" . cape-rfc1345))
+  :init
+  ;; Add `completion-at-point-functions', used by `completion-at-point'.
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  ;;(add-to-list 'completion-at-point-functions #'cape-history)
+  ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
+  ;;(add-to-list 'completion-at-point-functions #'cape-tex)
+  ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
+  ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
+  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;;(add-to-list 'completion-at-point-functions #'cape-ispell)
+  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
+  ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
+  ;;(add-to-list 'completion-at-point-functions #'cape-line)
+  )
 
 (use-package consult
   ;; Replace bindings. Lazily loaded due by `use-package'.
@@ -285,6 +340,7 @@
   (ace-window-display-mode 1))
 
 (use-package winner
+  :ensure nil
   :after evil
   :config
   (winner-mode)
@@ -356,6 +412,10 @@
   ([remap describe-command] . helpful-command)
   ([remap describe-key] . helpful-key))
 
+(use-package slime
+  :config
+  (setq inferior-lisp-program "sbcl"))
+
 (use-package typescript-mode
   :mode "\\.ts\\'"
   :hook (typescript-mode . lsp-deferred)
@@ -372,6 +432,7 @@
   (yas-global-mode 1))
 
 (use-package mu4e
+  :ensure nil
   :config
 
   ;; This is set to 't' to avoid mail syncing issues when using mbsync
@@ -383,31 +444,31 @@
   (setq mu4e-maildir "~/Mail")
 
   (setq mu4e-contexts
-	(list
-	 (make-mu4e-context
-	  :name "Private"
-	  :match-func
-	  (lambda (msg)
-	    (when msg
-	      (string-prefix-p "/Gmail" (mu4e-message-field msg :maildir))))
-	  :vars '((user-mail-address . "teknikgillaren@gmail.com")
-		  (user-full-name    . "Karl Elis Odenhage")
-		  (mu4e-drafts-folder  . "/Gmail/Drafts")
-		  (mu4e-sent-folder  . "/Gmail/Sent Mail")
-		  (mu4e-refile-folder  . "/Gmail/All Mail")
-		  (mu4e-trash-folder  . "/Gmail/Trash")
-		  (smtpmail-smtp-server . "smtp.google.com")
-		  (smtpmail-smtp-service . 465)
-		  (smtpmail-stream-type . ssl)))))
+        (list
+         (make-mu4e-context
+          :name "Private"
+          :match-func
+          (lambda (msg)
+            (when msg
+              (string-prefix-p "/Gmail" (mu4e-message-field msg :maildir))))
+          :vars '((user-mail-address . "teknikgillaren@gmail.com")
+                  (user-full-name    . "Karl Elis Odenhage")
+                  (mu4e-drafts-folder  . "/Gmail/Drafts")
+                  (mu4e-sent-folder  . "/Gmail/Sent Mail")
+                  (mu4e-refile-folder  . "/Gmail/All Mail")
+                  (mu4e-trash-folder  . "/Gmail/Trash")
+                  (smtpmail-smtp-server . "smtp.google.com")
+                  (smtpmail-smtp-service . 465)
+                  (smtpmail-stream-type . ssl)))))
 
   (setq message-send-mail-function 'smtpmail-send-it)
 
   (setq mu4e-maildir-shortcuts
-	'(("/Inbox"     . ?i)
-	  ("/Sent Mail" . ?s)
-	  ("/Trash"     . ?t)
-	  ("/Drafts"    . ?d)
-	  ("/All Mail"  . ?a))))
+        '(("/Inbox"     . ?i)
+          ("/Sent Mail" . ?s)
+          ("/Trash"     . ?t)
+          ("/Drafts"    . ?d)
+          ("/All Mail"  . ?a))))
 
 
 (use-package org-mime

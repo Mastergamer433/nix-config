@@ -35,6 +35,7 @@ in {
       (aspellWithDicts (ds: with ds; [ en en-computers en-science ]))
       sqlite
       mu
+      sbcl
     ];
     home.file = { 
       ".emacs.d/init.el" = {
