@@ -13,6 +13,15 @@
         default = "alacritty";
         alacritty.enable = true;
       };
+      media = {
+        spotify.enable = true;
+      };
+      browsers = {
+        nyxt.enable = true;
+      };
+      media = {
+        mpv.enable = true;
+      };
     };
 
     editors = { emacs.enable = true; };
