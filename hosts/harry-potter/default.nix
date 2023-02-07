@@ -5,19 +5,25 @@
   modules = {
     desktop = {
       herbstluftwm.enable = true;
-      apps = { discord.enable = true; };
+      apps = {
+        discord.enable = true;
+        polybar.enable = true;
+      };
       term = {
         default = "alacritty";
         alacritty.enable = true;
       };
       browsers = {
         nyxt.enable = true;
+        firefox.enable = true;
       };
       media = {
         mpv.enable = true;
+        spotify.enable = true;
       };
     };
     editors = { emacs.enable = true; };
+    dev = { scheme.enable = true; };
   };
 
   ## Local config
@@ -41,12 +47,6 @@
   services.openssh.startWhenNeeded = true;
 
   networking.networkmanager.enable = true;
-
-  services.xserver = {
-    enable = true;
-    displayManager.lightdm.enable = true;
-    desktopManager.cinnamon.enable = true;
-  };
 
   i18n = {
     defaultLocale = "en_US.UTF-8";

@@ -9,18 +9,10 @@ in {
   options.modules.desktop.herbstluftwm = { enable = mkBoolOpt false; };
 
   config = mkIf cfg.enable {
+    modules.desktop.xorg.enable = true;
     services = {
       picom.enable = true;
-      xserver = {
-        enable = true;
-        displayManager = {
-          lightdm.enable = true;
-          #  lightdm.greeters.mini.enable = true;
-        };
-        windowManager.herbstluftwm.enable = true;
-        layout = "se";
-        xkbOptions = "ctrl:nocaps,ctrl:swapcaps";
-      };
+      xserver.windowManager.herbstluftwm.enable = true;
     };
     user.packages = with pkgs; [
       rofi
@@ -29,15 +21,6 @@ in {
       dzen2
     ];
 
-    services.xserver.displayManager.sessionCommands = ''
-      ${pkgs.xorg.xmodmap}/bin/xmodmap "${pkgs.writeText  "xkb-layout" ''
-clear lock
-clear control
-keycode 66 = Control_L
-add control = Control_L
-add Lock = Control_R
-
-''}'';
     home.file = {
       ".config/herbstluftwm" = {
         source = "${configDir}/herbstluftwm";

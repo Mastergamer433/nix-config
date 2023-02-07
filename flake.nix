@@ -11,9 +11,10 @@
 
     # Extras
     emacs-overlay.url = "github:nix-community/emacs-overlay";
+    nur.url = "github:nix-community/nur";
   };
 
-  outputs = inputs@{ self, nixpkgs, home-manager, agenix, emacs-overlay, ... }:
+  outputs = inputs@{ self, nixpkgs, home-manager, agenix, emacs-overlay, nur, ... }:
     let
       inherit (lib.my) mapModules mapModulesRec mapHosts;
 

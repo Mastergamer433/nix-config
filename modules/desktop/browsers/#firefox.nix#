@@ -1,0 +1,45 @@
+{ options, config, lib, pkgs, inputs, ... }:
+
+with lib;
+with lib.my;
+let cfg = config.modules.desktop.browsers.firefox;
+in {
+  options.modules.desktop.browsers.firefox = with types; {
+    enable = mkBoolOpt false;
+  };
+
+  config = mkIf cfg.enable {
+    nixpkgs.overlays = [ inputs.nur.overlay ];
+
+    home-manager.programs.firefox = {
+      enable = true;
+      extensions = with pkgs.nur.repos.rycee.firefox-addons; [
+        bitwarden
+        ublock-origin
+        i-dont-care-about-cookies
+      ];
+      profiles = {
+        private = {
+          isDefault = true;
+          settings = {
+            "general.autoscroll" = true;
+            "browser.startup.homepage" = "https://auth.kimane.se";
+            "datareporting.healthreport.uploadEnabled" = false;
+            "identity.sync.tokenserver.uri" = "https://ffsync.nahfe.xyz/token/1.0/sync/1.5";
+            "browser.aboutConfig.showWarning" = false;
+            "extensions.activeThemeId" = "default-theme@mozilla.org";
+            "app.shield.optoutstudies.enabled" = false;
+            "services.sync.prefs.sync-seen.app.shield.optoutstudies.enabled" = false;
+            "services.sync.prefs.sync.app.shield.optoutstudies.enabled" = false;
+            "toolkit.telemetry.pioneer-new-studies-available" = false;
+            "browser.startup.homepage_override.mstone" = "ignore";
+            "dom.security.https_only_mode" = true;
+            "devtools.everOpened" = true;
+            "signon.management.page.breach-alerts.enabled" = false;
+            "signon.rememberSignons" = false;
+          };
+        };
+      };
+    };
+  };
+}

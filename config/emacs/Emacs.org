@@ -537,6 +537,12 @@ Projectile
     :config
     (setq inferior-lisp-program "sbcl"))
 #+end_src
+
+*** Scheme
+#+begin_src emacs-lisp
+  (use-package geiser)
+  (use-package geiser-guile)
+#+end_src
 *** TypeScript
 #+begin_src emacs-lisp
   (use-package typescript-mode
@@ -983,6 +989,4 @@ Projectile
     "sst" '(counsel-spotify-search-track :which-key "Search Track"))
 #+end_src
 
-* My own ELisp code
-So here i have my own elisp code for a lot of things.
-** 
+* My own Emacs package
