@@ -17,6 +17,10 @@ in {
         bitwarden
         ublock-origin
         i-dont-care-about-cookies
+        gesturefy
+        simple-tab-groups
+        tab-session-manager
+        tab-counter-plus
       ];
       profiles = {
         private = {

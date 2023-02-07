@@ -18,10 +18,12 @@
       };
       browsers = {
         nyxt.enable = true;
+        firefox.enable = true;
       };
       media = {
         mpv.enable = true;
       };
+      gaming = { flightgear.enable = false; };
     };
 
     editors = { emacs.enable = true; };
@@ -29,6 +31,22 @@
   };
 
   ## Local config
+  networking.wireguard.interfaces = {
+    wg0 = {
+      ips = [ "10.10.10.6/24" ];
+      privateKeyFile = config.age.secrets.wireguard.path;
+      peers = [
+        { # doomemacs
+          presharedKey = "1ti/VLsS7qeJyQ3MtrUGuNn2Mue64zwwaSap3ma2RIU=";
+          publicKey = "Vwqi4VfktCk6alMxwdHiOcEUEPRKUkL0fvbF1TmQRAU=";
+          allowedIPs = [ "10.10.10.0/24" ];
+          endpoint = "37.123.133.36:51820";
+          persistentKeepalive = 25;
+        }
+      ];
+    };
+  };
+
   programs.ssh.startAgent = true;
   services.openssh.startWhenNeeded = true;
 
