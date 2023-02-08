@@ -8,6 +8,13 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     agenix.url = "github:ryantm/agenix";
     agenix.inputs.nixpkgs.follows = "nixpkgs";
+    base16.url = "github:SenchoPens/base16.nix";
+    base16.inputs.nixpkgs.follows = "nixpkgs";
+
+    base16-schemes = {
+      url = github:base16-project/base16-schemes;
+      flake = false;
+    };
 
     # Extras
     emacs-overlay.url = "github:nix-community/emacs-overlay";
@@ -22,11 +29,11 @@
       system = "x86_64-linux";
 
       mkPkgs = pkgs: extraOverlays:
-        import pkgs {
-          inherit system;
-          config.allowUnfree = true; # forgive me Stallman senpai
-          overlays = extraOverlays ++ (lib.attrValues self.overlays);
-        };
+      import pkgs {
+        inherit system;
+        config.allowUnfree = true; # forgive me Stallman senpai
+        overlays = extraOverlays ++ (lib.attrValues self.overlays);
+      };
       pkgs = mkPkgs nixpkgs [ ];
 
       lib = nixpkgs.lib.extend (self: super: {
@@ -36,6 +43,7 @@
         };
       });
     in {
+
       lib = lib.my;
 
       overlays = mapModules ./overlays import;
@@ -45,5 +53,6 @@
       } // mapModulesRec ./modules import;
 
       nixosConfigurations = mapHosts ./hosts { };
+
     };
 }

@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }: {
+{ inputs, pkgs, config, lib, ... }: {
   imports = [ ../home.nix ./hardware-configuration.nix ];
 
   ## Modules
@@ -21,7 +21,9 @@
       media = { mpv.enable = true; };
       gaming = { flightgear.enable = false; };
     };
-
+    theme = {
+      active = "dracula";
+    };
     editors = { emacs.enable = true; };
     hardware.audio.enable = true;
   };

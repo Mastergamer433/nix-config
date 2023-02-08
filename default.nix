@@ -5,8 +5,11 @@
 { inputs, self, config, pkgs, lib, ... }:
 with lib;
 with lib.my; {
-  imports = [ inputs.home-manager.nixosModules.home-manager ]
-    ++ (mapModulesRec' (toString ./modules) import);
+  imports = [
+    inputs.home-manager.nixosModules.home-manager
+    inputs.base16.nixosModule
+  ]
+  ++ (mapModulesRec' (toString ./modules) import);
 
   nix = let
     filteredInputs = filterAttrs (n: _: n != "self") inputs;
