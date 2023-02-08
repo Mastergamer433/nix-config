@@ -6,11 +6,9 @@ with lib.my; {
     user = mkOpt attrs { };
 
     dotfiles = {
-      dir = mkOpt path
-        (removePrefix "/home/${config.user.name}"
-          (findFirst pathExists (toString ../.) [
-            "/home/${config.user.name}/new-config"
-          ]));
+      dir = mkOpt path (removePrefix "/home/${config.user.name}"
+        (findFirst pathExists (toString ../.)
+          [ "/home/${config.user.name}/new-config" ]));
       binDir = mkOpt path "${config.dotfiles.dir}/bin";
       configDir = mkOpt path "${config.dotfiles.dir}/config";
       modulesDir = mkOpt path "${config.dotfiles.dir}/modules";

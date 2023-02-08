@@ -1,4 +1,3 @@
- 
 { options, config, lib, pkgs, ... }:
 
 with lib;
@@ -10,14 +9,13 @@ in {
   options.modules.desktop.xorg = { enable = mkBoolOpt false; };
 
   config = mkIf cfg.enable {
-    user.packages = with pkgs; [
-      xorg.xmodmap
-    ];
+    user.packages = with pkgs; [ xorg.xmodmap ];
     services.xserver = {
       enable = true;
       displayManager = {
         lightdm.enable = true;
-        sessionCommands = "sleep 5 && ${pkgs.xorg.xmodmap}/bin/xmodmap ${configDir}/xmodmap/.Xmodmap";
+        sessionCommands =
+          "sleep 5 && ${pkgs.xorg.xmodmap}/bin/xmodmap ${configDir}/xmodmap/.Xmodmap";
       };
       layout = "se";
     };

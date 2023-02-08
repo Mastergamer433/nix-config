@@ -14,12 +14,7 @@ in {
       picom.enable = true;
       xserver.windowManager.herbstluftwm.enable = true;
     };
-    user.packages = with pkgs; [
-      rofi
-      nitrogen
-      conky
-      dzen2
-    ];
+    user.packages = with pkgs; [ rofi nitrogen conky dzen2 ];
 
     home.file = {
       ".config/herbstluftwm" = {

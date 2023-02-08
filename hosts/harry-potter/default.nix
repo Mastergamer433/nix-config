@@ -8,6 +8,7 @@
       apps = {
         discord.enable = true;
         polybar.enable = true;
+        flameshot.enable = true;
       };
       term = {
         default = "alacritty";
@@ -21,6 +22,10 @@
         mpv.enable = true;
         spotify.enable = true;
       };
+      gaming = {
+        steam.enable = true;
+        flightgear.enable = true;
+      };
     };
     editors = { emacs.enable = true; };
     dev = { scheme.enable = true; };
@@ -32,17 +37,16 @@
       ips = [ "10.10.10.3/24" ];
       listenPort = 51820;
       privateKeyFile = config.age.secrets.wireguard.path;
-      peers = [
-        { # doomemacs
-          presharedKey = "7A7W7Whrc1SPhw4O+jOGR5Lo+zRFjS81nuOfGrKO6fs=";
-          publicKey = "Vwqi4VfktCk6alMxwdHiOcEUEPRKUkL0fvbF1TmQRAU=";
-          allowedIPs = [ "10.10.10.0/24" ];
-          endpoint = "37.123.133.36:51820";
-        }
-      ];
+      peers = [{ # doomemacs
+        presharedKey = "7A7W7Whrc1SPhw4O+jOGR5Lo+zRFjS81nuOfGrKO6fs=";
+        publicKey = "Vwqi4VfktCk6alMxwdHiOcEUEPRKUkL0fvbF1TmQRAU=";
+        allowedIPs = [ "10.10.10.0/24" ];
+        endpoint = "37.123.133.36:51820";
+      }];
     };
   };
 
+  environment.systemPackages = with pkgs; [ ntfs3g ];
   programs.ssh.startAgent = true;
   services.openssh.startWhenNeeded = true;
 

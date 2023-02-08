@@ -2,8 +2,9 @@
 
 with lib;
 with lib.my;
-let cfg = config.modules.desktop.browsers.nyxt;
-    configDir = config.dotfiles.configDir;
+let
+  cfg = config.modules.desktop.browsers.nyxt;
+  configDir = config.dotfiles.configDir;
 in {
   options.modules.desktop.browsers.nyxt = with types; {
     enable = mkBoolOpt false;
@@ -18,7 +19,7 @@ in {
       gst_all_1.gst-plugins-ugly
       gst_all_1.gst-plugins-good
       gst_all_1.gst-plugins-base
-      
+
     ];
 
     home = {

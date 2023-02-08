@@ -25,9 +25,7 @@ in {
       profiles = {
         private = {
           isDefault = true;
-          settings = {
-            "general.autoscroll" = true;
-          };
+          settings = { "general.autoscroll" = true; };
         };
       };
     };

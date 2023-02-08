@@ -37,10 +37,10 @@ in {
       mu
       sbcl
     ];
-    home.file = { 
+    home.file = {
       ".emacs.d/init.el" = {
         source = "${configDir}/emacs/init.el";
-         recursive = true;
+        recursive = true;
       };
     };
     fonts.fonts = [ pkgs.emacs-all-the-icons-fonts pkgs.fira-code ];

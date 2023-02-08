@@ -20,8 +20,6 @@ in {
         }) (import secretsFile)
     else
       { };
-    identityPaths = [
-      "/home/mg433/.ssh/id_ed25519"
-    ];
+    identityPaths = [ "/home/mg433/.ssh/id_ed25519" ];
   };
 }

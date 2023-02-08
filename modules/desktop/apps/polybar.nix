@@ -2,12 +2,11 @@
 
 with lib;
 with lib.my;
-let cfg = config.modules.desktop.apps.polybar;
-    configDir = config.dotfiles.configDir;
+let
+  cfg = config.modules.desktop.apps.polybar;
+  configDir = config.dotfiles.configDir;
 in {
-  options.modules.desktop.apps.polybar = {
-    enable = mkBoolOpt false;
-  };
+  options.modules.desktop.apps.polybar = { enable = mkBoolOpt false; };
 
   config = mkIf cfg.enable {
     home.file.".config/polybar/" = {
@@ -15,9 +14,6 @@ in {
       recursive = true;
     };
 
-    user.packages = with pkgs; [
-      polybar
-      playerctl
-    ];
+    user.packages = with pkgs; [ polybar playerctl ];
   };
 }

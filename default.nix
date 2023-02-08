@@ -5,24 +5,23 @@
 { inputs, self, config, pkgs, lib, ... }:
 with lib;
 with lib.my; {
-  imports = [
-    inputs.home-manager.nixosModules.home-manager
-  ] ++ (mapModulesRec' (toString ./modules) import);
+  imports = [ inputs.home-manager.nixosModules.home-manager ]
+    ++ (mapModulesRec' (toString ./modules) import);
 
-  nix =
-    let filteredInputs = filterAttrs (n: _: n != "self") inputs;
-        nixPathInputs  = mapAttrsToList (n: v: "${n}=${v}") filteredInputs;
-        registryInputs = mapAttrs (_: v: { flake = v; }) filteredInputs;
-    in {
-      package = pkgs.nixFlakes;
-      extraOptions = "experimental-features = nix-command flakes";
-      nixPath = nixPathInputs ++ [
-        "nixpkgs-overlays=${config.dotfiles.dir}/overlays"
-        "dotfiles=${config.dotfiles.dir}"
-      ];
-      registry = registryInputs // { dotfiles.flake = inputs.self; };
-      settings.experimental-features = [ "nix-command" "flakes" ];
-    };
+  nix = let
+    filteredInputs = filterAttrs (n: _: n != "self") inputs;
+    nixPathInputs = mapAttrsToList (n: v: "${n}=${v}") filteredInputs;
+    registryInputs = mapAttrs (_: v: { flake = v; }) filteredInputs;
+  in {
+    package = pkgs.nixFlakes;
+    extraOptions = "experimental-features = nix-command flakes";
+    nixPath = nixPathInputs ++ [
+      "nixpkgs-overlays=${config.dotfiles.dir}/overlays"
+      "dotfiles=${config.dotfiles.dir}"
+    ];
+    registry = registryInputs // { dotfiles.flake = inputs.self; };
+    settings.experimental-features = [ "nix-command" "flakes" ];
+  };
 
   boot = {
     loader = {

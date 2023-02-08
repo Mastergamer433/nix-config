@@ -8,7 +8,5 @@ in {
     enable = mkBoolOpt false;
   };
 
-  config = mkIf cfg.enable {
-    user.packages = with pkgs; [ flightgear ];
-  };
+  config = mkIf cfg.enable { user.packages = with pkgs; [ flightgear ]; };
 }
