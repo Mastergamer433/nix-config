@@ -1,12 +1,12 @@
-{ options, config, lib, pkgs, inputs, ... }:
+{ options, config, lib, pkgs, ... }:
 
 with lib;
 with lib.my;
 let cfg = config.modules.theme;
 in {
   options.modules.theme = with types; {
-    active = mkOption {
-      type = nullOr str;
+    scheme = mkOption {
+      type = nullOr string;
       default = null;
       apply = v: let theme = builtins.getEnv "THEME"; in
       if theme != "" then theme else v;
@@ -17,9 +17,9 @@ in {
     };
   };
 
-  config = mkIf (cfg.active != null) {
+  config = mkIf (config.scheme != null) {
       home-manager.programs.alacritty.settings.colors =
-        with "${inputs.base16-schemes}/${config.modules.theme.active}.yaml".withHashtag; let default = {
+        with config.scheme.withHashtag; let default = {
           black = base00; white = base07;
           inherit red green yellow blue cyan magenta;
         };

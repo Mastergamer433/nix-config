@@ -36,6 +36,8 @@
       };
       pkgs = mkPkgs nixpkgs [ ];
 
+      scheme = "black-metal";
+
       lib = nixpkgs.lib.extend (self: super: {
         my = import ./lib {
           inherit pkgs inputs;
@@ -52,7 +54,7 @@
         dotfiles = import ./.;
       } // mapModulesRec ./modules import;
 
-      nixosConfigurations = mapHosts ./hosts { };
+      nixosConfigurations = mapHosts ./hosts { scheme = "${inputs.base16-schemes}/${scheme}.yaml";};
 
     };
 }
