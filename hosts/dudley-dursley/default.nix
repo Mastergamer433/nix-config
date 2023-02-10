@@ -21,9 +21,6 @@
       media = { mpv.enable = true; };
       gaming = { flightgear.enable = false; };
     };
-    theme = {
-      active = "dracula";
-    };
     editors = { emacs.enable = true; };
     hardware.audio.enable = true;
   };

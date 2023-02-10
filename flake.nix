@@ -36,7 +36,7 @@
       };
       pkgs = mkPkgs nixpkgs [ ];
 
-      scheme = "black-metal";
+      scheme = "material-palenight";
 
       lib = nixpkgs.lib.extend (self: super: {
         my = import ./lib {

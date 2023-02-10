@@ -416,6 +416,9 @@
   :config
   (setq inferior-lisp-program "sbcl"))
 
+(use-package geiser)
+(use-package geiser-guile)
+
 (use-package typescript-mode
   :mode "\\.ts\\'"
   :hook (typescript-mode . lsp-deferred)
@@ -474,6 +477,20 @@
 (use-package org-mime
   :bind
   ("C-<return>" . org-mime-htmlize))
+
+(use-package mpv)
+
+(use-package erc
+  :ensure nil
+  :config
+
+  )
+
+(use-package mastodon
+  :config
+  (setq mastodon-instance-url "https://emacs.ch"
+        mastodon-active-user "Mastergamer433")
+  (mastodon-discover))
 
 (defun keo/org-font-setup ()
   ;; Replace list hyphen with dot
