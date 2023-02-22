@@ -15,6 +15,10 @@
       url = github:base16-project/base16-schemes;
       flake = false;
     };
+    base16-rofi = {
+      url = "github:jordiorlando/base16-rofi";
+      flake = false;
+    };
 
     # Extras
     emacs-overlay.url = "github:nix-community/emacs-overlay";
@@ -36,7 +40,7 @@
       };
       pkgs = mkPkgs nixpkgs [ ];
 
-      scheme = "black-metal";
+      scheme = "onedark";
 
       lib = nixpkgs.lib.extend (self: super: {
         my = import ./lib {
@@ -52,7 +56,7 @@
 
       nixosModules = {
         dotfiles = import ./.;
-      } // mapModulesRec ./modules import;
+      } // mapModulesRec ./modules { inherit inputs; } import;
 
       nixosConfigurations = mapHosts ./hosts { scheme = "${inputs.base16-schemes}/${scheme}.yaml";};
 

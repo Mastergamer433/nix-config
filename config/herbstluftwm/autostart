@@ -30,8 +30,20 @@ hc keybind $Mod-q close
 hc keybind $Mod-Return spawn $myTerm
 hc keybind Mod1-Control-Return spawn  ./xmenu/xmenu.sh
 
-# Dmenu launcher
+# Start rofi
 hc keybind $Mod-d spawn rofi -show run
+
+# Open clipmenu
+hc keybind $Mod-c spawn CM_LAUNCHER=rofi clipmenu
+
+# Open emoji selector
+hc keybind $Mod-x spawn rofi -modi emoji -show emoji -kb-custom-1 Ctrl+C
+
+# Open bluetooth
+hc keybind $Mod-b spawn rofi-bluetooth
+
+# Open rofi calculator
+hc keybind $Mod-u spawn rofi -show calc -modi calc -no-show-match -no-sort
 
 # My dmenu scripts (Alt+Ctrl+Key)
 hc keybind $appMod-Control-p spawn passmenu
@@ -130,7 +142,6 @@ hc mousebind $Mod-Button3 resize
 hc keybind $Mod-BackSpace   cycle_monitor
 hc keybind $Mod-Tab         cycle_all +1
 hc keybind $Mod-Shift-Tab   cycle_all -1
-hc keybind $Mod-c cycle
 hc keybind $Mod-i jumpto urgent
 
 # theme

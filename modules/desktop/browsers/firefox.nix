@@ -13,6 +13,10 @@ in {
 
     home-manager.programs.firefox = {
       enable = true;
+      profiles = {
+        private = {
+          isDefault = true;
+          settings = { "general.autoscroll" = true; };
       extensions = with pkgs.nur.repos.rycee.firefox-addons; [
         bitwarden
         ublock-origin
@@ -21,11 +25,8 @@ in {
         simple-tab-groups
         tab-session-manager
         tab-counter-plus
+        darkreader
       ];
-      profiles = {
-        private = {
-          isDefault = true;
-          settings = { "general.autoscroll" = true; };
         };
       };
     };
