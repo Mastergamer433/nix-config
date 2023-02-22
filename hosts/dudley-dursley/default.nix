@@ -8,6 +8,8 @@
       apps = {
         discord.enable = true;
         polybar.enable = true;
+        flameshot.enable = true;
+        slock.enable = true;
       };
       term = {
         default = "alacritty";
@@ -17,15 +19,22 @@
       browsers = {
         nyxt.enable = true;
         firefox.enable = true;
+        qutebrowser.enable = true;
       };
       media = { mpv.enable = true; };
       gaming = { flightgear.enable = false; };
     };
-    theme = {
-      active = "dracula";
+    editors = {
+      emacs = {
+        enable = true;
+        daemonEnable = true;
+      };
     };
-    editors = { emacs.enable = true; };
-    hardware.audio.enable = true;
+    dev = {
+      scheme.enable = true;
+      common-lisp.enable = true;
+    };
+    hardware = { audio.enable = true; };
   };
 
   ## Local config

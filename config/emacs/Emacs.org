@@ -620,6 +620,31 @@ Projectile
 #+begin_src emacs-lisp
   (use-package mpv)
 #+end_src
+*** Controlling
+#+begin_src emacs-lisp
+  (use-package playerctl)
+#+end_src
+
+** Chatting
+*** ERC
+I like IRC so I wanna use ERC an IRC client for Emacs.
+#+begin_src emacs-lisp
+  (use-package erc
+    :ensure nil
+    :config
+    
+    )
+#+end_src
+
+** Mastodon
+#+begin_src emacs-lisp
+  (use-package mastodon
+    :config
+    (setq mastodon-instance-url "https://emacs.ch"
+          mastodon-active-user "Mastergamer433")
+    (mastodon-discover))
+#+end_src
+
 * Org mode
 ** Basic configuration
 #+begin_src emacs-lisp

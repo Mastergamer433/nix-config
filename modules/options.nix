@@ -25,6 +25,7 @@ with lib.my;
     home-manager = {
       programs = mkOpt' attrs { } "User programs";
       services = mkOpt' attrs { } "User services";
+      systemd = mkOpt' attrs { } "User systemd";
     };
 
     env = mkOption {
@@ -70,6 +71,7 @@ with lib.my;
         };
         programs = mkAliasDefinitions options.home-manager.programs;
         services = mkAliasDefinitions options.home-manager.services;
+        systemd = mkAliasDefinitions options.home-manager.systemd;
       };
     };
 
