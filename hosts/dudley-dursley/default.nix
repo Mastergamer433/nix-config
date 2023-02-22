@@ -24,7 +24,12 @@
       media = { mpv.enable = true; };
       gaming = { flightgear.enable = false; };
     };
-    editors = { emacs.enable = true; };
+    editors = {
+      emacs = {
+        enable = true;
+        daemonEnable = true;
+      };
+    };
     dev = {
       scheme.enable = true;
       common-lisp.enable = true;
