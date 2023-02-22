@@ -620,6 +620,11 @@ Projectile
 #+begin_src emacs-lisp
   (use-package mpv)
 #+end_src
+*** Controlling
+#+begin_src emacs-lisp
+  (use-package playerctl)
+#+end_src
+
 ** Chatting
 *** ERC
 I like IRC so I wanna use ERC an IRC client for Emacs.
@@ -630,6 +635,7 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
     
     )
 #+end_src
+
 ** Mastodon
 #+begin_src emacs-lisp
   (use-package mastodon
@@ -638,6 +644,7 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
           mastodon-active-user "Mastergamer433")
     (mastodon-discover))
 #+end_src
+
 * Org mode
 ** Basic configuration
 #+begin_src emacs-lisp

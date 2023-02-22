@@ -25,7 +25,11 @@
       gaming = { flightgear.enable = false; };
     };
     editors = { emacs.enable = true; };
-    hardware.audio.enable = true;
+    dev = {
+      scheme.enable = true;
+      common-lisp.enable = true;
+    };
+    hardware = { audio.enable = true; };
   };
 
   ## Local config
