@@ -2,8 +2,9 @@
 
 with lib;
 with lib.my;
-let cfg = config.modules.desktop.browsers.qutebrowser;
-configDir = config.dotfiles.configDir;
+let
+  cfg = config.modules.desktop.browsers.qutebrowser;
+  configDir = config.dotfiles.configDir;
 in {
   options.modules.desktop.browsers.qutebrowser = with types; {
     enable = mkBoolOpt false;
@@ -20,7 +21,8 @@ in {
         desktopName = "Qutebrowser (Private)";
         genericName = "Open a private Qutebrowser window";
         icon = "qutebrowser";
-        exec = ''${pkgs.qutebrowser}/bin/qutebrowser -T -s content.private_browsing true'';
+        exec =
+          "${pkgs.qutebrowser}/bin/qutebrowser -T -s content.private_browsing true";
         categories = [ "Network" ];
       })
       # For Brave adblock in qutebrowser, which is significantly better than the
@@ -38,15 +40,13 @@ in {
           autoplay = false;
         };
         editor.encoding = "utf-8";
-        colors =
-          with config.scheme.withHashtag;
-          {
-            # Becomes either 'dark' or 'light', based on your colors!
-            webppage.preferred_color_scheme = "${cfg.themeMode}";
-            tabs.bar.bg = "${base00}";
-            keyhint.fg = "${base05}";
-            # ...
-          };
+        colors = with config.scheme.withHashtag; {
+          # Becomes either 'dark' or 'light', based on your colors!
+          webppage.preferred_color_scheme = "${cfg.themeMode}";
+          tabs.bar.bg = "${base00}";
+          keyhint.fg = "${base05}";
+          # ...
+        };
       };
     };
   };

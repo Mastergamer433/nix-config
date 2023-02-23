@@ -12,7 +12,7 @@
     base16.inputs.nixpkgs.follows = "nixpkgs";
 
     base16-schemes = {
-      url = github:base16-project/base16-schemes;
+      url = "github:base16-project/base16-schemes";
       flake = false;
     };
     base16-rofi = {
@@ -33,11 +33,11 @@
       system = "x86_64-linux";
 
       mkPkgs = pkgs: extraOverlays:
-      import pkgs {
-        inherit system;
-        config.allowUnfree = true; # forgive me Stallman senpai
-        overlays = extraOverlays ++ (lib.attrValues self.overlays);
-      };
+        import pkgs {
+          inherit system;
+          config.allowUnfree = true; # forgive me Stallman senpai
+          overlays = extraOverlays ++ (lib.attrValues self.overlays);
+        };
       pkgs = mkPkgs nixpkgs [ ];
 
       scheme = "material-palenight";
@@ -58,7 +58,9 @@
         dotfiles = import ./.;
       } // mapModulesRec ./modules { inherit inputs; } import;
 
-      nixosConfigurations = mapHosts ./hosts { scheme = "${inputs.base16-schemes}/${scheme}.yaml";};
+      nixosConfigurations = mapHosts ./hosts {
+        scheme = "${inputs.base16-schemes}/${scheme}.yaml";
+      };
 
     };
 }

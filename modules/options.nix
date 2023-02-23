@@ -1,8 +1,7 @@
 { config, options, lib, home-manager, ... }:
 
 with lib;
-with lib.my;
-{
+with lib.my; {
   options = with types; {
     user = mkOpt attrs { };
 
