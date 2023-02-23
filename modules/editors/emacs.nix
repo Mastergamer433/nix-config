@@ -7,14 +7,14 @@ let
   pkg = (pkgs.emacsWithPackagesFromUsePackage {
     package =
       pkgs.emacs; # replace with pkgs.emacsPgtk, or another version if desired.
-      config = /. + builtins.toPath "${configDir}/emacs/Emacs.org";
-      # config = path/to/your/config.org; # Org-Babel configs also supported
+    config = /. + builtins.toPath "${configDir}/emacs/Emacs.org";
+    # config = path/to/your/config.org; # Org-Babel configs also supported
 
-      alwaysEnsure = true;
+    alwaysEnsure = true;
 
-      alwaysTangle = true;
-      # Optionally provide extra packages not in the configuration file.
-      extraEmacsPackages = epkgs: [ epkgs.use-package ];
+    alwaysTangle = true;
+    # Optionally provide extra packages not in the configuration file.
+    extraEmacsPackages = epkgs: [ epkgs.use-package ];
 
   });
   configDir = config.dotfiles.configDir;
@@ -48,8 +48,9 @@ in {
       Install.WantedBy = [ "default.target" ];
       Service = {
         Type = "forking";
-        ExecStart = "${pkgs.runtimeShell} -l -c \"${pkg}/bin/emacs --daemon\"";
-        ExecStop = "${pkgs.runtimeShell} -l -c \"${pkg}/bin/emacsclient --eval \\\"(kill-emacs)\\\"\"";
+        ExecStart = ''${pkgs.runtimeShell} -l -c "${pkg}/bin/emacs --daemon"'';
+        ExecStop = ''
+          ${pkgs.runtimeShell} -l -c "${pkg}/bin/emacsclient --eval \"(kill-emacs)\""'';
         Restart = "on-failure";
       };
     };

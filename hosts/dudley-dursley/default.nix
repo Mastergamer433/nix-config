@@ -5,6 +5,9 @@
   modules = {
     desktop = {
       herbstluftwm.enable = true;
+      autorandr = {
+        enable = true;
+      };
       apps = {
         discord.enable = true;
         polybar.enable = true;
@@ -43,10 +46,10 @@
       ips = [ "10.10.10.6/24" ];
       privateKeyFile = config.age.secrets.wireguard.path;
       peers = [{ # doomemacs
-        presharedKey = "1ti/VLsS7qeJyQ3MtrUGuNn2Mue64zwwaSap3ma2RIU=";
-        publicKey = "Vwqi4VfktCk6alMxwdHiOcEUEPRKUkL0fvbF1TmQRAU=";
+        presharedKey = "XzXU4EkJxrZ2XFxiXuLy30nFo7tRh0/KT0ofys0iXwU=";
+        publicKey = "tnwFMErFdkJWUh64+9n2e5K/SSIQoD1VNBfxYdIK3kg=";
         allowedIPs = [ "10.10.10.0/24" ];
-        endpoint = "37.123.133.36:51820";
+        endpoint = "kimane.se:51820";
         persistentKeepalive = 25;
       }];
     };

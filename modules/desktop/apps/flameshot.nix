@@ -6,5 +6,6 @@ let cfg = config.modules.desktop.apps.flameshot;
 in {
   options.modules.desktop.apps.flameshot = { enable = mkBoolOpt false; };
 
-  config = mkIf cfg.enable { home-manager.services.flameshot = { enable = true; }; };
+  config =
+    mkIf cfg.enable { home-manager.services.flameshot = { enable = true; }; };
 }

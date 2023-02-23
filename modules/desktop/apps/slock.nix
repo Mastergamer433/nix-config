@@ -8,7 +8,5 @@ let
 in {
   options.modules.desktop.apps.slock = { enable = mkBoolOpt false; };
 
-  config = mkIf cfg.enable {
-    programs.slock.enable = true;
-  };
+  config = mkIf cfg.enable { programs.slock.enable = true; };
 }
