@@ -38,6 +38,7 @@
       common-lisp.enable = true;
     };
     hardware = { audio.enable = true; };
+    shell = { fish.enable = true; };
   };
 
   ## Local config
