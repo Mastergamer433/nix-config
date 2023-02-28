@@ -27,6 +27,7 @@ in {
         tab-session-manager
         tab-counter-plus
         edit-with-emacs
+        darkreader
         (mkIf (config.scheme.slug == "dracula") dracula-dark-colorscheme)
       ];
       profiles = {
