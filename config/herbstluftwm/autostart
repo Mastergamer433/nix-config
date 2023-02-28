@@ -28,7 +28,8 @@ hc keybind $Mod-Shift-e quit
 hc keybind $Mod-r reload
 hc keybind $Mod-q close
 hc keybind $Mod-Return spawn $myTerm
-hc keybind Mod1-Control-Return spawn  ./xmenu/xmenu.sh
+hc keybind $appMod-Control-Return spawn  ./xmenu/xmenu.sh
+hc keybind $Mod-t spawn slock
 
 # Start rofi
 hc keybind $Mod-d spawn rofi -show run
@@ -102,18 +103,13 @@ tag_keys=( {1..9} 0 )
 hc rename default "${tag_names[0]}" || true
 for i in ${!tag_names[@]} ; do
     hc add "${tag_names[$i]}"
+    hc set_layout horizontal
     key="${tag_keys[$i]}"
     if ! [ -z "$key" ] ; then
         hc keybind "$Mod-$key" use_index "$i"
         hc keybind "$Mod-Shift-$key" move_index "$i"
     fi
 done
-
-for i in ${!tag_names[@]} ; do
-    hc use_index "$i"
-    hc set_layout horizontal
-done
-hc use_index "0"
 
 # cycle through tags
 hc keybind $Mod-period use_index +1 --skip-visible

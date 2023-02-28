@@ -11,7 +11,7 @@ in {
   };
 
   config = mkIf cfg.enable {
-    home-manager.programs.autorandr = {
+    services.autorandr = {
       enable = true;
       profiles = {
         projector = {
@@ -62,5 +62,7 @@ in {
         '';
       };
     };
+    user.packages = with pkgs; [ libnotify ];
+services.udev.extraRules = ''ACTION=="change", SUBSYSTEM=="drm", RUN+="${pkgs.autorandr}/bin/autorandr -c"'';
   };
 }
