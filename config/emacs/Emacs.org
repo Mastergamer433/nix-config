@@ -645,6 +645,15 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
     (mastodon-discover))
 #+end_src
 
+** Firefox
+#+begin_src emacs-lisp
+  (use-package edit-server
+    :config
+    (setq edit-server-new-frame t)
+    :init
+    (edit-server-start))
+#+end_src
+
 * Org mode
 ** Basic configuration
 #+begin_src emacs-lisp

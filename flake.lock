@@ -41,22 +41,6 @@
         "type": "github"
       }
     },
-    "base16-fish": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1622559957,
-        "narHash": "sha256-PebymhVYbL8trDVVXxCvZgc0S5VxI7I1Hv4RMSquTpA=",
-        "owner": "tomyun",
-        "repo": "base16-fish",
-        "rev": "2f6dd973a9075dabccd26f1cded09508180bf5fe",
-        "type": "github"
-      },
-      "original": {
-        "owner": "tomyun",
-        "repo": "base16-fish",
-        "type": "github"
-      }
-    },
     "base16-schemes": {
       "flake": false,
       "locked": {
@@ -201,7 +185,6 @@
       "inputs": {
         "agenix": "agenix",
         "base16": "base16",
-        "base16-fish": "base16-fish",
         "base16-schemes": "base16-schemes",
         "emacs-overlay": "emacs-overlay",
         "home-manager": "home-manager",
