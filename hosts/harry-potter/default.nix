@@ -31,32 +31,42 @@
         qemu.enable = true;
       };
     };
-    editors = { emacs.enable = true; };
+    editors = {
+      emacs = {
+        enable = true;
+        daemonEnable = true;
+      };
+    };
     dev = { scheme.enable = true; };
+    s
     hardware = {
       audio.enable = true;
       nvidia.enable = true;
     };
+    services = {
+      ssh.enable = true;
+      backup.enable = true;
+    }; 
   };
 
   ## Local config
-  #networking.wireguard.interfaces = {
-  #  wg0 = {
-  #    ips = [ "10.10.10.3/24" ];
-  #    listenPort = 51820;
-  #    privateKeyFile = config.age.secrets.wireguard.path;
-  #    peers = [{ # doomemacs
-  #      presharedKey = "7A7W7Whrc1SPhw4O+jOGR5Lo+zRFjS81nuOfGrKO6fs=";
-  #      publicKey = "Vwqi4VfktCk6alMxwdHiOcEUEPRKUkL0fvbF1TmQRAU=";
-  #      allowedIPs = [ "10.10.10.0/24" ];
-  #      endpoint = "37.123.133.36:51820";
-  #    }];
-  #  };
-  #};
+  networking.wireguard.interfaces = {
+    wg0 = {
+      ips = [ "10.10.10.3/24" ];
+      listenPort = 51820;
+      privateKeyFile = config.age.secrets.wireguard.path;
+      peers = [{ # doomemacs
+      presharedKey = "7A7W7Whrc1SPhw4O+jOGR5Lo+zRFjS81nuOfGrKO6fs=";
+      publicKey = "Vwqi4VfktCk6alMxwdHiOcEUEPRKUkL0fvbF1TmQRAU=";
+      allowedIPs = [ "10.10.10.0/24" ];
+      endpoint = "37.123.133.36:51820";
+      }];
+    };
+  };
 
   environment.systemPackages = with pkgs; [ ntfs3g ];
   programs.ssh.startAgent = true;
-  #services.openssh.startWhenNeeded = true;
+  services.openssh.startWhenNeeded = true;
 
   networking.networkmanager.enable = true;
 

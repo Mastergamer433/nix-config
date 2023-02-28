@@ -8,5 +8,10 @@ in {
     enable = mkBoolOpt false;
   };
 
-  config = mkIf cfg.enable { user.packages = with pkgs; [ prismlauncher ]; };
+  config = mkIf cfg.enable {
+    user.packages = with pkgs; [
+      prismlauncher
+    ];
+    programs.java.enable = true;
+  };
 }

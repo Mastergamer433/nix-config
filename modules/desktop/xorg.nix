@@ -11,6 +11,12 @@ in {
   config = mkIf cfg.enable {
     user.packages = with pkgs; [ xorg.xmodmap ];
     services.xserver = {
+      screenSection = ''
+        Option         "metamodes" "nvidia-auto-select +0+0 {ForceFullCompositionPipeline=On}"
+        Option         "AllowIndirectGLXProtocol" "off"
+        Option         "TripleBuffer" "on"
+      '';
+
       enable = true;
       displayManager = {
         lightdm.enable = true;
