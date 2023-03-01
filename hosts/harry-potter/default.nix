@@ -38,7 +38,10 @@
       };
     };
     dev = { scheme.enable = true; };
-    s
+    shell = {
+      fish.enable = true;
+      starship.enable = true;
+    };
     hardware = {
       audio.enable = true;
       nvidia.enable = true;
