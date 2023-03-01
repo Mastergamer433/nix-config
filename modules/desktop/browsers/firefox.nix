@@ -17,7 +17,10 @@ in {
       profiles = {
         private = {
           isDefault = true;
-          settings = { "general.autoscroll" = true; };
+          settings = {
+            "general.autoscroll" = true;
+            "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+          };
           extensions = with pkgs.nur.repos.rycee.firefox-addons; [
             bitwarden
             ublock-origin

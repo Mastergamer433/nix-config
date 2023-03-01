@@ -9,6 +9,7 @@
         enable = true;
       };
       apps = {
+        rofi.enable = true;
         discord.enable = true;
         polybar.enable = true;
         flameshot.enable = true;
@@ -25,9 +26,9 @@
         qutebrowser.enable = true;
       };
       media = { mpv.enable = true; };
-      gaming = { flightgear.enable = false; };
     };
     editors = {
+      vim.enable = true;
       emacs = {
         enable = true;
         daemonEnable = true;
@@ -36,11 +37,16 @@
     dev = {
       scheme.enable = true;
       common-lisp.enable = true;
+      nix.enable = true;
     };
     hardware = { audio.enable = true; };
     shell = {
       fish.enable = true;
       starship.enable = true;
+    };
+    services = {
+      docker.enable = true;
+      ssh.enable = true;
     };
   };
 
