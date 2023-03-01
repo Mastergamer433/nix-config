@@ -56,8 +56,8 @@ in {
     };
 
     home.file = {
-      ".emacs.d/init.el" = {
-        source = "${configDir}/emacs/init.el";
+      ".emacs.d/" = {
+        source = "${configDir}/emacs/";
         recursive = true;
       };
     };
