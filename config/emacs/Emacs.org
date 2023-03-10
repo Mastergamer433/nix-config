@@ -543,6 +543,7 @@ Projectile
   (use-package geiser)
   (use-package geiser-guile)
 #+end_src
+
 *** TypeScript
 #+begin_src emacs-lisp
   (use-package typescript-mode
@@ -555,8 +556,14 @@ Projectile
 
 *** Nix
 #+begin_src emacs-lisp
-    (use-package nix-mode
-       :mode "\\.nix\\'")
+  (use-package nix-mode
+    :mode "\\.nix\\'")
+#+end_src
+
+*** Haskell
+#+begin_src emacs-lisp
+  (use-package haskell-mode
+    :mode "\\.hs\\'")
 #+end_src
 
 ** Snippets with yasnippet

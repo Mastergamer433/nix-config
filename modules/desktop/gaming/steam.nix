@@ -11,6 +11,14 @@ in {
   config = mkIf cfg.enable {
     programs.steam.enable = true;
 
+    user.packages = with pkgs; [
+      protontricks
+      winetricks
+      protonup
+    ];
+    hardware.xone.enable = true;
+    environment.systemPackages = with pkgs; [ linuxKernel.packages.linux_zen.xone ];
+
     # better for steam proton games
     systemd.extraConfig = "DefaultLimitNOFILE=1048576";
   };

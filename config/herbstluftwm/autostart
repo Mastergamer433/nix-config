@@ -50,7 +50,7 @@ hc keybind $Mod-u spawn rofi -show calc -modi calc -no-show-match -no-sort
 hc keybind $appMod-Control-p spawn passmenu
 hc keybind $appMod-Control-w spawn ./.rofi/rofi-windowmenu.sh
 
-# My applications (Super+Alt+Key)
+# My applications (Alt+Key)
 hc keybind $appMod-l spawn $myTerm -e lynx -cfg=~/.lynx.cfg -lss=~/.lynx.lss http://www.distrowatch.com
 hc keybind $appMod-r spawn $myTerm -e rtv
 hc keybind $appMod-i spawn $myIrcClient
@@ -58,6 +58,12 @@ hc keybind $appMod-y spawn $myTerm -e youtube-viewer
 hc keybind $appMod-e spawn $myEditor
 hc keybind $appMod-u spawn urxvt
 hc keybind $appMod-s spawn flameshot gui
+hc keybind $appMod-d spawn "pkill -9 Discord; discord"
+hc keybind $appMod-q spawn spotify
+
+# My games (Alt+Shift+Key)
+hc keybind $appMod-Shift-m spawn prismlauncher
+hc keybind $appMod-Shift-d spawn launch-doom
 
 # focusing clients
 hc keybind $Mod-Left          focus left
