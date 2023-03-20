@@ -1,4 +1,4 @@
 let
   key =
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICoiE+DqG3s3aDpjYZsiLcoU+SDgnRaKP0Q3DWRvQB2B mg433@harry-potter";
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIID1bhNzIcUZNgOAISOb57K7tiXzxLPHxG+hGnjQA68h Encrypt Secrets Nix, Agenix.";
 in { "wireguard.age".publicKeys = [ key ]; }

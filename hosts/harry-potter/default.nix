@@ -3,13 +3,17 @@
   ## Modules
   modules = {
     desktop = {
+      wallpapers.enable = true;
       herbstluftwm.enable = true;
+      xmonad.enable = true;
+      awesome.enable = true;
       apps = {
         discord.enable = true;
         polybar.enable = true;
         flameshot.enable = true;
         rofi.enable = true;
         slock.enable = true;
+        dbeaver.enable = true;
       };
       term = {
         default = "alacritty";
@@ -39,7 +43,11 @@
         daemonEnable = true;
       };
     };
-    dev = { scheme.enable = true; };
+    dev = {
+      scheme.enable = true;
+      fennel.enable = true;
+      rust.enable = true;
+    };
     shell = {
       fish.enable = true;
       starship.enable = true;
@@ -50,8 +58,9 @@
     };
     services = {
       ssh.enable = true;
-      backup.enable = true;
+      #syncthing.enable = true;
     }; 
+    backup.enable = true;
   };
 
   ## Local config
@@ -69,9 +78,8 @@
       ];
     };
   };
-  networking.firewall.enable = false;
-
-  environment.systemPackages = with pkgs; [ ntfs3g ];
+  networking.nameservers = ["192.168.21.228" "1.1.1.1"];
+  environment.systemPackages = with pkgs; [ ntfs3g dmenu ];
   programs.ssh.startAgent = true;
   services.openssh.startWhenNeeded = true;
 
