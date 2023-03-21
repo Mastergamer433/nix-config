@@ -20,6 +20,7 @@ in {
           settings = {
             "general.autoscroll" = true;
             "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+            "accessibility.typeaheadfind.enablesound" = false;
           };
           extensions = with pkgs.nur.repos.rycee.firefox-addons; [
             bitwarden

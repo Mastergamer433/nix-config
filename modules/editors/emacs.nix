@@ -40,6 +40,7 @@ in {
       sqlite
       mu
       sbcl
+      haskell-language-server
     ];
 
     home-manager.systemd.user.services."emacs" = mkIf cfg.daemonEnable {
