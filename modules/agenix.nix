@@ -10,7 +10,7 @@ let
 in {
   imports = [ agenix.nixosModules.age ];
   environment.systemPackages = [ agenix.packages.x86_64-linux.default ];
-
+  modules.shell.fish.aliases = {"agenix" = "agenix -i /home/mg433/.ssh/id_encrypt ";};
   age = {
     secrets = if pathExists secretsFile then
       mapAttrs' (n: _:
@@ -20,6 +20,6 @@ in {
         }) (import secretsFile)
     else
       { };
-    identityPaths = [ "/home/mg433/.ssh/id_ed25519" ];
+    identityPaths = [ "/home/mg433/.ssh/id_encrypt" ];
   };
 }

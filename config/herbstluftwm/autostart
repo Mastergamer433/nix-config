@@ -18,11 +18,12 @@ conky &
 hc keyunbind --all
 
 # keybindings
-Mod=Mod4                            # Use the super key as the main modifier
-appMod=Mod1                         # Use the alt key as the aplication modifier
-myTerm=alacritty                    # Set my preferred terminal
-myEditor="emacsclient -c -a emacs"  # Set my preferred editor
-myIrcClient="emacsclient -c -a emacs -e (erc)"  # Set my preferred irc client
+Mod=Mod4                            # Use the super key as the main modifier.
+appMod=Mod1                         # Use the alt key as the aplication modifier.
+myTerm=alacritty                    # Set my preferred terminal.
+myEditor="emacsclient -c -a emacs"  # Set my preferred editor.
+myIrcClient="emacsclient -c -a emacs -e (erc)"  # Set my preferred irc client.
+myBrowser=firefox  # Set my preferred web browser.
 
 hc keybind $Mod-Shift-e quit
 hc keybind $Mod-r reload
@@ -50,7 +51,7 @@ hc keybind $Mod-u spawn rofi -show calc -modi calc -no-show-match -no-sort
 hc keybind $appMod-Control-p spawn passmenu
 hc keybind $appMod-Control-w spawn ./.rofi/rofi-windowmenu.sh
 
-# My applications (Super+Alt+Key)
+# My applications (Alt+Key)
 hc keybind $appMod-l spawn $myTerm -e lynx -cfg=~/.lynx.cfg -lss=~/.lynx.lss http://www.distrowatch.com
 hc keybind $appMod-r spawn $myTerm -e rtv
 hc keybind $appMod-i spawn $myIrcClient
@@ -58,6 +59,15 @@ hc keybind $appMod-y spawn $myTerm -e youtube-viewer
 hc keybind $appMod-e spawn $myEditor
 hc keybind $appMod-u spawn urxvt
 hc keybind $appMod-s spawn flameshot gui
+hc keybind $appMod-d chain \
+      '->' spawn pkill -9 Discord \
+      '->' spawn discord
+hc keybind $appMod-q spawn spotify
+hc keybind $appMod-n spawn $myBrowser
+
+# My games (Alt+Shift+Key)
+hc keybind $appMod-Shift-m spawn prismlauncher
+hc keybind $appMod-Shift-d spawn launch-doom
 
 # focusing clients
 hc keybind $Mod-Left          focus left
@@ -103,7 +113,6 @@ tag_keys=( {1..9} 0 )
 hc rename default "${tag_names[0]}" || true
 for i in ${!tag_names[@]} ; do
     hc add "${tag_names[$i]}"
-    hc set_layout horizontal
     key="${tag_keys[$i]}"
     if ! [ -z "$key" ] ; then
         hc keybind "$Mod-$key" use_index "$i"

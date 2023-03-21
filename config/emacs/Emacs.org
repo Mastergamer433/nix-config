@@ -224,7 +224,6 @@ display-time-world command provides a nice display of the time at a specified li
       ;; Bind dedicated completion commands
       ;; Alternative prefix keys: C-c p, M-p, M-+, ...
       :bind (("C-c c p" . completion-at-point) ;; capf
-             ("TAB"     . completion-at-point)
              ("C-c c t" . complete-tag)        ;; etags
              ("C-c c d" . cape-dabbrev)        ;; or dabbrev-completion
              ("C-c c h" . cape-history)
@@ -556,19 +555,30 @@ Projectile
 
 *** Nix
 #+begin_src emacs-lisp
-    (use-package nix-mode
-       :mode "\\.nix\\'")
+  (use-package nix-mode
+    :mode "\\.nix\\'")
 #+end_src
 
 *** Haskell
 #+begin_src emacs-lisp
-  (use-package lsp-haskell
-    :hook
-    (haskell-mode-hook . lsp)
-    (haskell-literate-mode-hook . lsp))
-  
-  (use-package haskell-mode
-    :mode "\\.hs\\'")
+    (use-package haskell-mode
+      :mode "\\.hs\\'"
+)
+#+end_src
+
+*** Rust
+#+begin_src emacs-lisp
+  (use-package rust-mode
+    :mode "\\.rs\\'"
+    :hook (rust-mode . lsp-deferred))
+#+end_src
+
+*** Lua
+#+begin_src emacs-lisp
+  (use-package lua-mode
+    :mode "\\.lua\\'"
+    :hook (lua-mode . lsp-deferred))
+>>>>>>> 39619946817a5df8de6dcb7fe07c121f4abdc94e
 #+end_src
 ** Snippets with yasnippet
 #+begin_src emacs-lisp

@@ -1,0 +1,4 @@
+all: rc.lua
+
+%.lua: %.fnl
+    fennel --compile $< > $@
