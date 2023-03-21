@@ -44,6 +44,7 @@
       };
     };
     dev = {
+      lua.enable = true;
       scheme.enable = true;
       fennel.enable = true;
       rust.enable = true;

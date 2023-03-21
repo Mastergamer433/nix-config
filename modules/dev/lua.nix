@@ -2,17 +2,15 @@
 
 with lib;
 with lib.my;
-let cfg = config.modules.dev.rust;
+let cfg = config.modules.dev.lua;
 in {
-  options.modules.dev.rust = {
+  options.modules.dev.lua = {
     enable = mkBoolOpt false;
   };
 
   config = mkIf cfg.enable {
     user.packages = with pkgs; [
-      cargo
-      rust-analyzer
-      rustfmt
+      lua-language-server
     ];
   };
 }

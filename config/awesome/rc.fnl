@@ -1,2 +1,2 @@
 (local awful (require "awful"))
-(awesome.spawn "spotify")
+(awful.spawn "spotify")
