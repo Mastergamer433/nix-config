@@ -15,7 +15,7 @@ in {
           size = 10;
         };
         window = {
-          opacity = 0.6;
+          opacity = 1; #0.6;
           dynamic_title = true;
         };
         draw_bold_text_with_bright_colors = true;
