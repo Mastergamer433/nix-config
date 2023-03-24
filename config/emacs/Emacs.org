@@ -1044,4 +1044,12 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
     "sst" '(counsel-spotify-search-track :which-key "Search Track"))
 #+end_src
 
-* My own Emacs package
+* My own Emacs functions
+** Org agenda
+I wanna have a function to open org agenda in a new frame with another instance name som my window manager can manage the placement of the window.
+#+begin_src emacs-lisp
+  (defun keo/org-agenda ()
+    (select-frame (make-frame '((name . "Calendar"))))
+    (org-agenda-list)
+    (delete-other-windows))
+#+end_src

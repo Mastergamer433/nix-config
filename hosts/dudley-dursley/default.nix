@@ -5,9 +5,11 @@
   modules = {
     desktop = {
       herbstluftwm.enable = true;
+      awesome.enable = true;
       autorandr = {
         enable = true;
       };
+      wallpapers.enable = true;
       apps = {
         rofi.enable = true;
         discord.enable = true;
@@ -38,6 +40,8 @@
       scheme.enable = true;
       common-lisp.enable = true;
       nix.enable = true;
+      lua.enable = true;
+      rust.enable = true;
     };
     hardware = { audio.enable = true; };
     shell = {
@@ -69,11 +73,11 @@
   services.openssh.startWhenNeeded = true;
 
   networking.networkmanager.enable = true;
+  networking.nameservers = ["10.10.10.3" "1.1.1.1"];
 
   services.xserver = {
     enable = true;
     displayManager.lightdm.enable = true;
-    desktopManager.cinnamon.enable = true;
   };
 
   i18n = {
