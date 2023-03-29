@@ -84,7 +84,7 @@
       (awful.key [ modkey ] "p" (fn [] (menubar.show))
                  { :description "show menubar" :group "launcher" })))
 
-(local clientkeys
+(set clientkeys
        (gears.table.join
 	 (awful.key [ modkey ] "f"
 		    (fn [c]
@@ -132,7 +132,7 @@
 		       (let [tag (client.focus.screen.tags i)]
 			 (if tag (client.focus:toggle_tag tag)))))
                    { :description (.. "toggle focused client on tag #" i) :group "tag"}))))
-(local clientbuttons
+(var clientbuttons
        (gears.table.join
          (awful.button [ ] 1 (fn [c]
              (c:emit_signal "request::activate" "mouse_click" { :raise true })))
