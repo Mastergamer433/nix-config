@@ -42,6 +42,7 @@
       nix.enable = true;
       lua.enable = true;
       rust.enable = true;
+      fennel.enable = true;
     };
     hardware = { audio.enable = true; };
     shell = {

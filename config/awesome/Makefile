@@ -1,4 +1,4 @@
-all: rc.lua
+all: rc.lua keybinds.lua
 
 %.lua: %.fnl
 	fennel --compile $< > $@

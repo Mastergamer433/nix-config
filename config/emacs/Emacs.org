@@ -650,6 +650,12 @@ Projectile
     :mode "\\.lua\\'"
     :hook (lua-mode . lsp-deferred))
 #+end_src
+
+*** Fennel
+#+begin_src emacs-lisp
+  (use-package fennel-mode
+    :mode "\\.fnl\\'")
+#+end_src
 ** Snippets with yasnippet
 #+begin_src emacs-lisp
   (use-package yasnippet
@@ -1164,11 +1170,12 @@ I wanna have a function to open org agenda in a new frame with another instance 
 
 ** Awesomewm denote new note
 #+begin_src emacs-lisp
-  (defun keo/awesomewm-denote-new-note (title keywords subdirectory)
+  (defun keo/awesomewm-denote-new-note ()
     (select-frame (make-frame '((name . "New-Note"))))
-    (denote-create-note title (delete "" (split-string keywords)) nil (concat (denote-directory) subdirectory))
+    (call-interactively 'denote-subdirectory)
     (delete-other-windows))
 #+end_src
+
 ** Awesomewm new client
 #+begin_src emacs-lisp
   ;;(emacsql awesomewm-db [:create-table clients
