@@ -1,6 +1,8 @@
 -- Standard awesome library
 local gears = require("gears")
 local awful = require("awful")
+local wibox = require("wibox")
+local naughty = require("naughty")
 require("awful.autofocus")
 local menubar = require("menubar")
 local hotkeys_popup = require("awful.hotkeys_popup")
@@ -20,9 +22,55 @@ globalkeys = gears.table.join(
       {description="open emacsclient", group="application"}),
    awful.key({ appmodkey,           }, "s",      function () awful.spawn("flameshot gui") end,
       {description="take screenshot", group="application"}),
-   awful.key({ appmodkey,           }, "c",      function () awful.spawn("emacsclient -c -e \"(keo/org-agenda)\"") end,
+   awful.key({ appmodkey,           }, "c",      function () awful.spawn("emacsclient -e \"(keo/org-agenda)\"") end,
       {description="open calendar in emacsclient", group="application"}),
-
+   awful.key({ appmodkey,           }, "n",      function ()
+	 local atextbox = wibox.widget.textbox()
+	 local title = "test"
+	 local keywords = "test"
+	 local subdirectory = "test"
+	 -- awful.prompt.run {
+	 --    prompt       = '<b>Title: </b>',
+	 --    text         = 'default command',
+	 --    bg_cursor    = '#ff0000',
+	 --    -- To use the default rc.lua prompt:
+	 --    --textbox      = mouse.screen.mypromptbox.widget,
+	 --    textbox      = atextbox,
+	 --    exe_callback = function(input)
+	 --       if not input or #input == 0 then return end
+	 --       naughty.notify{ text = 'The input was: '..input }
+	 --       title = input
+	 --    end
+	 -- }
+	 -- awful.prompt.run {
+	 --    prompt       = '<b>Keywords: </b>',
+	 --    text         = 'default command',
+	 --    bg_cursor    = '#ff0000',
+	 --    -- To use the default rc.lua prompt:
+	 --    --textbox      = mouse.screen.mypromptbox.widget,
+	 --    textbox      = atextbox,
+	 --    exe_callback = function(input)
+	 --       if not input or #input == 0 then return end
+	 --       naughty.notify{ text = 'The input was: '..input }
+	 --       keywords = input
+	 --    end
+	 -- }
+	 -- awful.prompt.run {
+	 --    prompt       = '<b>Subdirectory: </b>',
+	 --    text         = 'default command',
+	 --    bg_cursor    = '#ff0000',
+	 --    -- To use the default rc.lua prompt:
+	 --    --textbox      = mouse.screen.mypromptbox.widget,
+	 --    textbox      = atextbox,
+	 --    exe_callback = function(input)
+	 --       if not input or #input == 0 then return end
+	 --       naughty.notify{ text = 'The input was: '..input }
+	 --       subdirectory = input
+	 --    end
+	 -- }
+	 awful.spawn("emacsclient -e \"(keo/awesomewm-denote-new-note " .. title .. " " .. keywords .. " " .. subdirectory .. ")\"")
+   end,
+      {description="create a new denote enry in emacsclient", group="application"}),
    -- Other key bindings
    awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
       {description="show help", group="awesome"}),

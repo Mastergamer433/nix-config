@@ -14,6 +14,7 @@
         rofi.enable = true;
         slock.enable = true;
         dbeaver.enable = true;
+        mbsync.enable = true;
       };
       term = {
         default = "alacritty";
@@ -22,6 +23,7 @@
       browsers = {
         nyxt.enable = true;
         firefox.enable = true;
+        castor.enable = true;
       };
       media = {
         mpv.enable = true;
@@ -52,6 +54,9 @@
     shell = {
       fish.enable = true;
       starship.enable = true;
+      pass.enable = true;
+      gnupg.enable = true;
+      file.enable = true;
     };
     hardware = {
       audio.enable = true;
@@ -60,6 +65,7 @@
     services = {
       ssh.enable = true;
       #syncthing.enable = true;
+      mysql.enable = true;
     }; 
     backup.enable = true;
   };

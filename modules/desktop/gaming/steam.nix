@@ -12,6 +12,7 @@ in {
     programs.steam.enable = true;
 
     user.packages = with pkgs; [
+      wineWowPackages.stable
       protontricks
       winetricks
       protonup

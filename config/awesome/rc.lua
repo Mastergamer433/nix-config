@@ -18,6 +18,7 @@ local hotkeys_popup = require("awful.hotkeys_popup")
 -- when client with a matching name is opened:
 require("awful.hotkeys_popup.keys")
 require("keybinds")
+require("awful.remote")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -250,6 +251,14 @@ awful.rules.rules = {
 	placement = awful.placement.centered,
      }, },
 
+   { rule = { instance = "New-Note" },
+     properties = {
+	floating = true,
+	width = 500,
+	height = 500,
+	delayed_placement = awful.placement.centered,
+     }, },
+
    { rule = { class = "Spotify" },
      properties = { screen = 1, tag = "1" } },
 
@@ -271,8 +280,16 @@ client.connect_signal("manage", function (c)
 			    -- Prevent clients from being unreachable after screen count changes.
 			    awful.placement.no_offscreen(c)
 			 end
+			 naughty.notify({text = c.name})
+			 --awful.spawn("emacsclient -e \"(keo/awesomewm-new-client :id " .. c.window .. " :class \\\"" .. c.class .."\\\":name \\\"" .. c.name .. "\\\")\"")
+end)
+client.connect_signal("property::name", function(c)
+			 --awful.spawn("emacsclient -e \"(keo/awesomewm-rename-client :id " .. c.window .. " :class \\\"" .. c.class .."\\\" :name \\\"" .. c.name .. "\\\")\"")
 end)
 
+client.connect_signal("unmanage", function(c)
+			 awful.spawn("emacsclient -e \"(keo/awesomewm-remove-client :id " .. c.window .. ")\"")
+end)
 -- Add a titlebar if titlebars_enabled is set to true in the rules.
 client.connect_signal("request::titlebars", function(c)
 			 -- buttons for the titlebar

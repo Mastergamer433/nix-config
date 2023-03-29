@@ -52,6 +52,7 @@ in {
             behave
             auto-tab-discard
             (mkIf (config.scheme.slug == "dracula") dracula-dark-colorscheme)
+            (mkIf config.modules.shell.gnupg.enable browserpass)
           ];
         };
       };
