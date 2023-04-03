@@ -44,9 +44,13 @@
 (local editor_cmd editor)
 (local modkey "Mod4")
 (local appmodkey "Mod1")
+(set customization {})
+(set customization.gap 2)
 
 ;; Themes define colours, icons, font and wallpapers.
-(beautiful.init (.. (gears.filesystem.get_themes_dir) "default/theme.lua"))
+(beautiful.init (.. (gears.filesystem.get_configuration_dir) "theme.lua"))
+
+(set beautiful.useless_gap customization.gap)
 
 (local mykeyboardlayout (awful.widget.keyboardlayout))
 
@@ -211,6 +215,12 @@
         :properties {
 	             :floating true
 	             :placement awful.placement.centered
+                     }
+        }
+
+      { :rule { :class "emacs" }
+        :properties {
+                     :size_hints_honor false
                      }
         }
 

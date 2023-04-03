@@ -1,0 +1,50 @@
+#+title: Awesomewm config
+#+author: Elis Odenhage
+#+PROPERTY: header-args:fennel :tangle ./rc.fnl
+
+* Libs
+#+begin_src fennel
+  (pcall :require "luarocks.loader")
+
+  (local gears     (require :gears))
+  (local beautiful (require :beautiful))
+  (local awful     (require :awful))
+  (local naughty   (require :naughty))
+  (local hotkeys_popup (require :awful.hotkeys_popup))
+  (local wibox     (require :wibox))
+  (local menubar   (require :menubar))
+
+  (require :awful.hotkeys_popup.keys)
+  (require :keybinds)
+  (require :awful.remote)
+#+end_src
+
+* Error handling on startup
+#+begin_src fennel
+  (fn initialize []
+    ;; Error handling
+    ;; Check if awesome encountered an error during startup and fell back to
+    ;; another config (This code will only ever execute for the fallback config)
+    (let [preset { :timeout 0 :bg "#000000" :fg "#ff0000" :max_height 1080 }]
+      (when awesome.startup_errors
+        (naughty.notify {:preset preset
+                         :title "Oops, there were errors during startup!"
+                         :text awesome.startup_errors}))
+
+      (var in-error false)
+      (awesome.connect_signal
+       "debug::error"
+       (fn [err]
+         ;; Make sure we don't go into an endless error loop
+         (when (not in-error)
+           (set in-error true)
+           (naughty.notify {:preset preset
+                            :title "Oops, an error happened!"
+                            :text (tostring err)})
+           (naughty.notify {:preset preset
+                            :title "Oops, an error happened!"
+                            :text (tostring err)})
+           (set in-error false))))))
+
+  (initialize)
+#+end_src

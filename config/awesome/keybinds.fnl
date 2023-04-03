@@ -20,6 +20,9 @@
                  { :description "open calendar in emacsclient" :group "application"})
       (awful.key [ appmodkey ] "n" (fn [] (awful.spawn "emacsclient -e \"(keo/awesomewm-denote-new-note)\""))
                  { :description "create a new denote enry in emacsclient" :group "application" })
+
+      (awful.key [ modkey ] "Return" (fn [] (awful.spawn "alacritty"))
+                 { :description "open a terminal" :group "application" })
       (awful.key [ modkey ] "s" hotkeys_popup.show_help
                  { :description "show help" :group "awesome" })
       (awful.key [ modkey ] "t" (fn [] (awful.spawn "slock"))
@@ -110,7 +113,7 @@
 		       (let [scr (awful.screen.focused)
 			     tag (. scr.tags i)]
 			 (if tag (tag:view_only))))
-                   { :description (.. "view tag #" i) :group "tag"})
+                   {:description (.. "view tag #" i) :group "tag"})
         ;; Toggle tag display.
         (awful.key [ modkey "Control" ] (.. "#" (+ i 9))
                    (fn []
