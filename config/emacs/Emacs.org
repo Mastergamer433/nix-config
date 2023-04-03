@@ -767,6 +767,10 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
   (use-package elpher)
 #+end_src
 
+** Matrix
+#+begin_src emacs-lisp
+  (use-package ement)
+#+end_src
 * Denote
 #+begin_src emacs-lisp
   (use-package denote

@@ -15,6 +15,7 @@
         slock.enable = true;
         dbeaver.enable = true;
         mbsync.enable = true;
+        element.enable = true;
       };
       term = {
         default = "alacritty";
@@ -50,6 +51,7 @@
       scheme.enable = true;
       fennel.enable = true;
       rust.enable = true;
+      unity.enable = true;
     };
     shell = {
       fish.enable = true;
@@ -86,7 +88,7 @@
     };
   };
   networking.nameservers = ["192.168.21.228" "1.1.1.1"];
-  environment.systemPackages = with pkgs; [ ntfs3g dmenu ];
+  environment.systemPackages = with pkgs; [ ntfs3g dmenu pcmanfm ];
   programs.ssh.startAgent = true;
   services.openssh.startWhenNeeded = true;
 
