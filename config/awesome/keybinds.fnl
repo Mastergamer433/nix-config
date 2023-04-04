@@ -112,7 +112,8 @@
 		   (fn []
 		       (let [scr (awful.screen.focused)
 			     tag (. scr.tags i)]
-			 (if tag (tag:view_only))))
+			 (if tag
+                             (tag:view_only))))
                    {:description (.. "view tag #" i) :group "tag"})
         ;; Toggle tag display.
         (awful.key [ modkey "Control" ] (.. "#" (+ i 9))

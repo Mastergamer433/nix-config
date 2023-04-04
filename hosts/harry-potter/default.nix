@@ -88,7 +88,7 @@
     };
   };
   networking.nameservers = ["192.168.21.228" "1.1.1.1"];
-  environment.systemPackages = with pkgs; [ ntfs3g dmenu pcmanfm ];
+  environment.systemPackages = with pkgs; [ ntfs3g dmenu pcmanfm teams ];
   programs.ssh.startAgent = true;
   services.openssh.startWhenNeeded = true;
 
