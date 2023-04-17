@@ -218,7 +218,7 @@
                      }
         }
 
-      { :rule { :class "emacs" }
+      { :rule { :class "Emacs" }
         :properties {
                      :size_hints_honor false
                      }

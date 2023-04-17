@@ -16,6 +16,7 @@
         polybar.enable = true;
         flameshot.enable = true;
         slock.enable = true;
+        kmonad.enable = true;
       };
       term = {
         default = "alacritty";
@@ -46,7 +47,13 @@
     };
     hardware = { audio.enable = true; };
     shell = {
-      fish.enable = true;
+      fish = {
+        enable = true;
+        rcInit = ''
+zoxide init fish | source
+'';
+      };
+      zoxide.enable = true;
       starship.enable = true;
     };
     services = {
