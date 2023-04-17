@@ -21,12 +21,13 @@
     };
 
     # Extras
+    kmonad.url = "github:kmonad/kmonad?dir=nix";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     nur.url = "github:nix-community/nur";
   };
 
   outputs =
-    inputs@{ self, nixpkgs, home-manager, agenix, emacs-overlay, nur, ... }:
+    inputs@{ self, nixpkgs, home-manager, agenix, emacs-overlay, nur, kmonad, ... }:
     let
       inherit (lib.my) mapModules mapModulesRec mapHosts;
 
@@ -53,6 +54,9 @@
       lib = lib.my;
 
       overlays = mapModules ./overlays import;
+
+      packages."${system}" =
+        mapModules ./packages (p: pkgs.callPackage p {});
 
       nixosModules = {
         dotfiles = import ./.;

@@ -7,6 +7,7 @@
       herbstluftwm.enable = true;
       xmonad.enable = true;
       awesome.enable = true;
+      dwm.enable = true;
       apps = {
         discord.enable = true;
         polybar.enable = true;
@@ -16,6 +17,7 @@
         dbeaver.enable = true;
         mbsync.enable = true;
         element.enable = true;
+        #kmonad.enable = true;
       };
       term = {
         default = "alacritty";
@@ -59,6 +61,7 @@
       pass.enable = true;
       gnupg.enable = true;
       file.enable = true;
+      zoxide.enable = true;
     };
     hardware = {
       audio.enable = true;

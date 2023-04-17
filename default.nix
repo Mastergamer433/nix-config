@@ -6,7 +6,7 @@
 with lib;
 with lib.my; {
   imports =
-    [ inputs.home-manager.nixosModules.home-manager inputs.base16.nixosModule ]
+    [ inputs.home-manager.nixosModules.home-manager inputs.base16.nixosModule inputs.kmonad.nixosModules.default ]
     ++ (mapModulesRec' (toString ./modules) import);
 
   nix = let
