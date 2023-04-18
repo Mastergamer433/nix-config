@@ -10,8 +10,7 @@ in {
   config = mkIf cfg.enable {
     services.kmonad = {
       enable = true; # disable to not run kmonad at startup
-      keyboards = {
-        name = "1";
+      keyboards.desktop = {
         device = "/dev/input/by-uid/usb-Kingston_HyperX_Alloy_FPS_Mechanical_Gaming_Keyboard-event-kbd";
         config = builtins.readFile "${configDir}/kmonad/config.kbd";
       };

@@ -17,7 +17,7 @@
         dbeaver.enable = true;
         mbsync.enable = true;
         element.enable = true;
-        #kmonad.enable = true;
+        kmonad.enable = true;
       };
       term = {
         default = "alacritty";

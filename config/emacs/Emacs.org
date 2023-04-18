@@ -698,7 +698,7 @@ Projectile
                     (mu4e-sent-folder  . "/Sent Mail")
                     (mu4e-refile-folder  . "/All Mail")
                     (mu4e-trash-folder  . "/Trash")
-                    (smtpmail-smtp-server . "mx01.zyner.net")
+                    (smtpmail-smtp-server . "isp.zyner.net")
                     (smtpmail-smtp-service . 465)
                     (smtpmail-stream-type . ssl)))))
 
@@ -712,6 +712,16 @@ Projectile
             ("/Drafts"    . ?d)
             ("/All Mail"  . ?a))))
 
+  (use-package mu4e-alert
+    :after mu4e
+    :config
+    ;; Show unread emails from all inboxes
+    (setq mu4e-alert-interesting-mail-query dw/mu4e-inbox-query)
+
+    ;; Show notifications for mails already notified
+    (setq mu4e-alert-notify-repeated-mails nil)
+
+    (mu4e-alert-enable-notifications))
 
   (use-package org-mime
     :bind
