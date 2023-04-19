@@ -17,6 +17,7 @@
         flameshot.enable = true;
         slock.enable = true;
         #kmonad.enable = true;
+        sxhkd.enable = true;
       };
       term = {
         default = "alacritty";
@@ -64,6 +65,7 @@ zoxide init fish | source
       };
       docker.enable = true;
       ssh.enable = true;
+      #arion.enable = true;
     };
   };
 

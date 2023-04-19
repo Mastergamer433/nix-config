@@ -6,14 +6,15 @@ let cfg = config.modules.services.arion;
 in {
   options.modules.services.arion = {
     enable = mkBoolOpt false;
-    projects = mkOpt {};
   };
 
   config = mkIf cfg.enable {
     modules.services.docker.enable = true;
     virtualisation.arion = {
       backend = "docker";
-      projects = cfg.projects;
+      projects.project.settings = {
+        imports = [ (/. + builtins.toPath "${toString ../../hosts}/${config.networking.hostName}/arion-compose.nix") ];
+      };
     };  
   };
 }

@@ -10,6 +10,7 @@
     agenix.inputs.nixpkgs.follows = "nixpkgs";
     base16.url = "github:SenchoPens/base16.nix";
     base16.inputs.nixpkgs.follows = "nixpkgs";
+    arion.url = "github:hercules-ci/arion";
 
     base16-schemes = {
       url = "github:base16-project/base16-schemes";
