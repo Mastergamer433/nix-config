@@ -15,6 +15,21 @@ in {
       pinentryFlavor = "qt";
     };
 
-    user.packages = [ pkgs.tomb ];
+    user.packages = [
+      pkgs.tomb
+      (let tomb-encrypt =
+        with pkgs; (writeScriptBin "tomb-encrypt" ''
+          #!${stdenv.shell}
+          tomb lock $1.tomb -k $1.tomb
+        '');
+      in tomb-encrypt)
+
+      (let tomb-decrypt =
+        with pkgs; (writeScriptBin "tomb-decrypt" ''
+          #!${stdenv.shell}
+          tomb lock $1
+        '');
+      in tomb-decrypt)
+    ];
   };
 }

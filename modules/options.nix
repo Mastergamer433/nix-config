@@ -40,6 +40,7 @@ with lib.my; {
   };
 
   config = {
+    users.groups.uinput = {};
     user = let
       user = builtins.getEnv "USER";
       name = if elem user [ "" "root" ] then "mg433" else user;
@@ -51,7 +52,8 @@ with lib.my; {
       home = "/home/${name}";
       group = "users";
       uid = 1000;
-    };
+   
+ };
 
     # Install user packages to /etc/profiles instead. Necessary for
     # nixos-rebuild build-vm to work.
