@@ -1,0 +1,14 @@
+{ options, config, lib, ... }:
+
+with lib;
+with lib.my;
+let cfg = config.modules.services.git.sync.dotfiles;
+in {
+  options.modules.services.git.sync.dotfiles = {
+    enable = mkBoolOpt false;
+  };
+
+  config = mkIf cfg.enable {
+
+  };
+}

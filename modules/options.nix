@@ -8,7 +8,7 @@ with lib.my; {
     dotfiles = {
       dir = mkOpt path (removePrefix "/home/${config.user.name}"
         (findFirst pathExists (toString ../.)
-          [ "/home/${config.user.name}/new-config" ]));
+          [ "/home/${config.user.name}/.dotfiles" ]));
       binDir = mkOpt path "${config.dotfiles.dir}/bin";
       configDir = mkOpt path "${config.dotfiles.dir}/config";
       modulesDir = mkOpt path "${config.dotfiles.dir}/modules";

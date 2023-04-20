@@ -16,7 +16,8 @@
         polybar.enable = true;
         flameshot.enable = true;
         slock.enable = true;
-        kmonad.enable = true;
+        #kmonad.enable = true;
+        sxhkd.enable = true;
       };
       term = {
         default = "alacritty";
@@ -57,8 +58,14 @@ zoxide init fish | source
       starship.enable = true;
     };
     services = {
+      git = {
+        sync = {
+          dotfiles.enable = true;
+        };
+      };
       docker.enable = true;
       ssh.enable = true;
+      #arion.enable = true;
     };
   };
 
