@@ -512,6 +512,25 @@ display-time-world command provides a nice display of the time at a specified li
   (setq window-manager-wallpaper-path "~/.wallpapers/nixos.png")
 #+end_src
 
+* Keep Folders Clean
+#+begin_src emacs-lisp
+  (setq backup-directory-alist `(("." . ,(expand-file-name "tmp/backups/" user-emacs-directory))))
+
+
+  ;; auto-save-mode doesn't create the path automatically!
+  (make-directory (expand-file-name "tmp/auto-saves/" user-emacs-directory) t)
+
+  (setq auto-save-list-file-prefix (expand-file-name "tmp/auto-saves/sessions/" user-emacs-directory)
+        auto-save-file-name-transforms `((".*" ,(expand-file-name "tmp/auto-saves/" user-emacs-directory) t)))
+
+  (setq create-lockfiles nil)
+
+  (setq projectile-known-projects-file (expand-file-name "tmp/projectile-bookmarks.eld" user-emacs-directory)
+        lsp-session-file (expand-file-name "tmp/.lsp-session-v1" user-emacs-directory))
+
+  (use-package no-littering)
+#+end_src
+
 * Development
 ** Git
 Magit
@@ -599,6 +618,19 @@ Projectile
     ([remap describe-variable] . helpful-variable)
     ([remap describe-command] . helpful-command)
     ([remap describe-key] . helpful-key))
+
+  (use-package highlight-defined
+    :hook (emacs-lisp-mode . highlight-defined-mode))
+
+  (use-package elmacro
+    :hook (emacs-lisp-mode . elmacro-mode))
+
+  (use-package suggest
+    :hook (emacs-lisp-mode . suggest-mode))
+
+  (use-package easy-escape
+    :hooks ((emacs-lisp-mode . easy-escape-minor-mode)
+            (lisp-mode       . easy-escape-minor-mode)))
 #+end_src
 
 *** Common Lisp
@@ -745,8 +777,15 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
   (use-package erc
     :ensure nil
     :config
-    
+
     )
+  (keo/leader-keys
+    "e" '(:ignore t :which-key "ERC")
+    "ej" '(lambda () (interactive)
+            (insert "/join #") :which-key "Join")
+    "eq" '(lambda () (interactive)
+            (insert "/quit")
+            (erc-send-current-line) :which-key "Quit"))
 #+end_src
 
 ** Mastodon
@@ -781,6 +820,45 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 #+begin_src emacs-lisp
   (use-package ement)
 #+end_src
+* File Management
+** Dired
+#+begin_src emacs-lisp
+    (use-package dired
+      :ensure nil
+      :commands (dired dired-jump)
+      :bind (("C-x C-j" . dired-jump))
+      :custom ((dired-listing-switches "-agho --group-directories-first"))
+      :config
+      (evil-collection-define-key 'normal 'dired-mode-map
+        "h" 'dired-single-up-directory
+        "l" 'dired-single-buffer))
+
+  (keo/leader-keys
+    "d"   '(:ignore t :which-key "dired")
+    "dd"  '(dired :which-key "Here")
+    "dh"  '((lambda () (interactive) (dired "~")) :which-key "Home")
+    "dn"  '((lambda () (interactive) (dired "~/Notes")) :which-key "Notes")
+    "do"  '((lambda () (interactive) (dired "~/Downloads")) :which-key "Downloads")
+    "d."  '((lambda () (interactive) (dired "~/.dotfiles")) :which-key "dotfiles")
+    "de"  '((lambda () (interactive) (dired "~/.dotfiles/config/emacs")) :which-key ".emacs.d"))
+#+end_src
+
+** Dired Single
+#+begin_src emacs-lisp
+  (use-package dired-single)
+#+end_src
+
+** Dired Icons
+#+begin_src emacs-lisp
+  (use-package all-the-icons-dired
+    :hook (dired-mode . all-the-icons-dired-mode))
+#+end_src
+
+** Move to trash instead of deleting.
+#+begin_src emacs-lisp
+  (setq delete-by-moving-to-trash t)
+#+end_src
+
 * Denote
 #+begin_src emacs-lisp
   (use-package denote
@@ -978,6 +1056,15 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 #+end_src
 
 * Keyboard keybinds
+** Which key
+#+begin_src emacs-lisp
+  (use-package which-key
+    :init (which-key-mode)
+    :diminish which-key-mode
+    :config
+    (setq which-key-idle-delay 0))
+#+end_src
+
 ** Evil
 #+begin_src emacs-lisp
   (use-package evil
@@ -1020,42 +1107,15 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 
 ** General leader key
 #+begin_src emacs-lisp
-    (keo/leader-keys
-    "t"  '(:ignore t :which-key "Toggles")
-    "tt" '(counsel-load-theme :which-key "Choose Theme")
-    "o" '(:ignore t :which-key "Org")
-    "oa" '(org-agenda-list :which-key "List Org Agenda")
-    "ob" '(:ignore t :which-key "Bable")
-    "obt" '(org-babel-tangle :which-key "Tangle")
+  (keo/leader-keys
     "b" '(:ignore t :which-key "Buffer")
     "bs" '(consult-buffer :which-key "Switch Buffer")
-    "w" '(:ignore :which-key "EXWM")
-    "wr" '(exwm-reset)
-    "ww" '(exwm-workspace-switch :which-key "Switch workspace")
-    "wh" '(windmove-left :which-key "Focus the window to the left")
-    "wj" '(windmove-down :which-key "Focus the window down") 
-    "wk" '(windmove-up :which-key "Focus the window up")
-    "wl" '(windmove-right :which-key "Focus the window to the right")
-    "w&" '(lambda (command)
-            (interactive (list (read-shell-command "$ ")))
-            (start-process-shell-command command nil command))
-    "wf" '(exwm-layout-toggle-fullscreen)
-    "e" '(:ignore t :which-key "ERC")
-    "ej" '(lambda () (interactive)
-            (insert "/join #") :which-key "Join")
-    "eq" '(lambda () (interactive)
-            (insert "/quit")
-            (erc-send-current-line) :which-key "Quit")
-
-    "p" '(:ignore t :which-key "pass")
+    "fd" '(:ignore t :which-key "dotfiles")
+    "fde" '((lambda () (interactive) (find-file "~/.dotfiles/config/emacs/Emacs.org")))
+    "p" '(:ignore t :which-key "Pass")
     "pp" '(password-store-copy :which-key "Copy")
     "pn" '(password-store-insert :which-key "New")
-    "pg" '(password-store-generate :which-key "Generate")
-    "s" '(:ignore t :which-key "Spotify")
-    "sP" '(counsel-spotify-toggle-play-pause :which-key "Play/Pause")
-    "sn" '(counsel-spotify-next :which-key "Next")
-    "sp" '(counsel-spotify-previous :which-key "Previuos")
-    "sst" '(counsel-spotify-search-track :which-key "Search Track"))
+    "pg" '(password-store-generate :which-key "Generate"))
 #+end_src
 
 * Libs
