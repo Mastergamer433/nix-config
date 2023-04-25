@@ -15,9 +15,9 @@ in {
     home.file = {
       ".mbsyncrc".text = ''
 IMAPAccount kimane
-Host isp.zyner.net
+Host mail.kimane.se
 User mg433@kimane.se
-Pass "@4#8*2$@R4*#u66264"
+PassCmd "pass email/kimane.se/mg433"
 SSLType IMAPS
 CertificateFile /etc/ssl/certs/ca-certificates.crt
 

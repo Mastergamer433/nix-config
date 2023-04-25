@@ -23,6 +23,7 @@ appMod=Mod1                         # Use the alt key as the aplication modifier
 myTerm=alacritty                    # Set my preferred terminal.
 myEditor="emacsclient -c -a emacs"  # Set my preferred editor.
 myIrcClient="emacsclient -c -a emacs -e (erc)"  # Set my preferred irc client.
+myConfigEditor="emacsclient -e (keo/new-config-frame)"  # Set my preferred editor for editing configs.
 myEmacsConfigCommand="emacsclient -e \"(keo/wm-open-config \\\"emacs\\\")\"" 
 myHerbstluftConfigCommand="emacsclient -e \"(keo/wm-open-config \\\"herbstluft\\\")\"" 
 myBrowser=firefox  # Set my preferred web browser.
@@ -173,7 +174,11 @@ hc rule title='Oracle VM VirtualBox Manager' tag=5
 hc rule class=VirtualBox pseudotile=on
 hc rule class=VirtualBox fullscreen=on
 hc rule instance=mpvFullscreen fullscreen=on
+<<<<<<< Updated upstream
 hc rule instance=Emacs-Config floating=on floatplacement=center
+=======
+hc rule instance=Config class=Emacs tag=config
+>>>>>>> Stashed changes
 hc rule focus=on # normally focus new clients
 #hc rule focus=off # normally do not focus new clients
 # give focus to most common terminals
@@ -195,3 +200,4 @@ hc detect_monitors
 
 # start the panel
 hc spawn polybar i3-panel --reload &
+hc spawn $myConfigEditor

@@ -750,6 +750,8 @@ Projectile
     (setq mu4e-update-interval (* 10 60))
     (setq mu4e-get-mail-command "mbsync -a")
     (setq mu4e-maildir "~/Mail")
+    (setq mu4e-completing-read-function #'completing-read)
+    (setq mu4e-change-filenames-when-moving t)
 
     (setq mu4e-contexts
           (list
@@ -765,12 +767,39 @@ Projectile
                     (mu4e-sent-folder  . "/Sent Mail")
                     (mu4e-refile-folder  . "/All Mail")
                     (mu4e-trash-folder  . "/Trash")
-                    (smtpmail-smtp-server . "isp.zyner.net")
+                    (smtpmail-smtp-server . "mail.kimane.se")
                     (smtpmail-smtp-service . 465)
                     (smtpmail-stream-type . ssl)))))
 
+    (defun remove-nth-element (nth list)
+      (if (zerop nth) (cdr list)
+        (let ((last (nthcdr (1- nth) list)))
+          (setcdr last (cddr last))
+          list)))
+    (setq mu4e-marks (remove-nth-element 5 mu4e-marks))
+    (add-to-list 'mu4e-marks
+                 '(trash
+                   :char ("d" . "▼")
+                   :prompt "dtrash"
+                   :dyn-target (lambda (target msg) (mu4e-get-trash-folder msg))
+                   :action (lambda (docid msg target)
+                             (mu4e~proc-move docid
+                                             (mu4e~mark-check-target target) "-N"))))
+
     (setq message-send-mail-function 'smtpmail-send-it)
     (setq mu4e-compose-signature "- mg433")
+
+    (setq message-kill-buffer-on-exit t)
+
+    ;; Display options
+    (setq mu4e-view-show-images t)
+    (setq mu4e-view-show-addresses 't)
+
+    ;; Composing mail
+    (setq mu4e-compose-dont-reply-to-self t)
+
+    ;; Use mu4e for sending e-mail
+    (setq mail-user-agent 'mu4e-user-agent)
 
     (setq mu4e-maildir-shortcuts
           '(("/Inbox"     . ?i)
@@ -778,6 +807,13 @@ Projectile
             ("/Trash"     . ?t)
             ("/Drafts"    . ?d)
             ("/All Mail"  . ?a))))
+
+  (setq keo/mu4e-inbox-query
+        "maildir:/Inbox AND flag:unread")
+
+  (defun keo/go-to-inbox ()
+    (interactive)
+    (mu4e-headers-search dw/mu4e-inbox-query))
 
   (use-package mu4e-alert
     :after mu4e
@@ -844,6 +880,10 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 ** Password Manager
 #+begin_src emacs-lisp
   (use-package password-store)
+
+  (use-package auth-source
+    :config
+    (setq auth-source '(password-store)))
 #+end_src
 
 ** Gemini
@@ -1198,6 +1238,15 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
   ;; (keo/wm-open-config "herbstluft")
 #+end_src
 
+** Mail count
+#+begin_src emacs-lisp
+  (defun keo/mail-count (max-count)
+    (if keo/mu4e-inbox-query
+      (let* ((mail-count (shell-command-to-string
+                           (format "mu find --nocolor -n %s \"%s\" | wc -l" max-count keo/mu4e-inbox-query))))
+        (format " %s" (string-trim mail-count)))
+      ""))
+#+end_src
 ** Proxmox
 #+begin_src emacs-lisp
   (defvar proxmox-base-url "https://proxmox.kimane.se/api2/json")
@@ -1290,6 +1339,16 @@ I wanna have a function to open org agenda in a new frame with another instance 
     (delete-other-windows))
 #+end_src
 
+** Open config frame
+#+begin_src emacs-lisp
+  (defun keo/new-config-frame ()
+    (select-frame (make-frame '((name . "Config"))))
+    (persp-switch "Config")
+    (find-file "~/.dotfiles/config/emacs/Emacs.org")
+    (split-window)
+    (find-file "~/.dotfiles/config/herbstluftwm/autostart")
+    (delete-other-windows))
+#+end_src
 ** Awesomewm denote new note
 #+begin_src emacs-lisp
   (defun keo/awesomewm-denote-new-note ()
