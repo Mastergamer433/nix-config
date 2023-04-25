@@ -23,6 +23,8 @@ appMod=Mod1                         # Use the alt key as the aplication modifier
 myTerm=alacritty                    # Set my preferred terminal.
 myEditor="emacsclient -c -a emacs"  # Set my preferred editor.
 myIrcClient="emacsclient -c -a emacs -e (erc)"  # Set my preferred irc client.
+myEmacsConfigCommand="emacsclient -e \"(keo/wm-open-config \\\"emacs\\\")\"" 
+myHerbstluftConfigCommand="emacsclient -e \"(keo/wm-open-config \\\"herbstluft\\\")\"" 
 myBrowser=firefox  # Set my preferred web browser.
 
 hc keybind $Mod-Shift-e quit
@@ -32,7 +34,18 @@ hc keybind $Mod-Return spawn $myTerm
 hc keybind $appMod-Control-Return spawn  ./xmenu/xmenu.sh
 hc keybind $Mod-t spawn slock
 hc keybind $appMod-k spawn xdotool type "2K\@5246\%\$3\#\@2\$\$24k"
+configKeys=( e )
 
+# Build the command to unbind the keys
+configKeysUnbind=(  )
+for k in "${configKeys[@]}" Escape ; do
+    configKeysUnbind+=( , keyunbind "$k" )
+done
+hc keybind $appMod-c chain \
+    '->' spawn notify-send "Select a workspace number or press Escape" \
+    '->' keybind "${configKeys[0]}" chain "${configKeysUnbind[@]}" , spawn $myEmacsConfigCommand \
+    '->' keybind "${configKeys[0]}" chain "${configKeysUnbind[@]}" , spawn $myHerbstfluftConfigCommand\
+    '->' keybind Escape             chain "${unbind[@]}"
 # Start rofi
 hc keybind $Mod-d spawn rofi -show run
 
@@ -160,6 +173,7 @@ hc rule title='Oracle VM VirtualBox Manager' tag=5
 hc rule class=VirtualBox pseudotile=on
 hc rule class=VirtualBox fullscreen=on
 hc rule instance=mpvFullscreen fullscreen=on
+hc rule instance=Emacs-Config floating=on floatplacement=center
 hc rule focus=on # normally focus new clients
 #hc rule focus=off # normally do not focus new clients
 # give focus to most common terminals

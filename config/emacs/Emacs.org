@@ -693,7 +693,42 @@ Projectile
   (use-package yasnippet
     :config
     (setq yas-snippet-dirs '("~/emacs/snippets"))
-    (yas-global-mode 1))
+    (yas-global-mode 0))
+
+  (use-package tempel
+    ;; Require trigger prefix before template name when completing.
+    ;; :custom
+    ;; (tempel-trigger-prefix "<")
+
+    :bind (("TAB" . tempel-complete) ;; Alternative tempel-expand
+           ("M-*" . tempel-insert))
+
+    :init
+
+    ;; Setup completion at point
+    (defun tempel-setup-capf ()
+      ;; Add the Tempel Capf to `completion-at-point-functions'.
+      ;; `tempel-expand' only triggers on exact matches. Alternatively use
+      ;; `tempel-complete' if you want to see all matches, but then you
+      ;; should also configure `tempel-trigger-prefix', such that Tempel
+      ;; does not trigger too often when you don't expect it. NOTE: We add
+      ;; `tempel-expand' *before* the main programming mode Capf, such
+      ;; that it will be tried first.
+      (setq-local completion-at-point-functions
+                  (cons #'tempel-expand
+                        completion-at-point-functions)))
+
+    (add-hook 'prog-mode-hook 'tempel-setup-capf)
+    (add-hook 'text-mode-hook 'tempel-setup-capf)
+
+    ;; Optionally make the Tempel templates available to Abbrev,
+    ;; either locally or globally. `expand-abbrev' is bound to C-x '.
+    (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+    (global-tempel-abbrev-mode)
+  )
+
+  (use-package tempel-collection)
+
 #+end_src
 
 ** Simple HTTPD
@@ -820,18 +855,19 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 #+begin_src emacs-lisp
   (use-package ement)
 #+end_src
+
 * File Management
 ** Dired
 #+begin_src emacs-lisp
-    (use-package dired
-      :ensure nil
-      :commands (dired dired-jump)
-      :bind (("C-x C-j" . dired-jump))
-      :custom ((dired-listing-switches "-agho --group-directories-first"))
-      :config
-      (evil-collection-define-key 'normal 'dired-mode-map
-        "h" 'dired-single-up-directory
-        "l" 'dired-single-buffer))
+  (use-package dired
+    :ensure nil
+    :commands (dired dired-jump)
+    :bind (("C-x C-j" . dired-jump))
+    :custom ((dired-listing-switches "-agho --group-directories-first"))
+    :config
+    (evil-collection-define-key 'normal 'dired-mode-map
+      "h" 'dired-single-up-directory
+      "l" 'dired-single-buffer))
 
   (keo/leader-keys
     "d"   '(:ignore t :which-key "dired")
@@ -1150,6 +1186,18 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 #+end_src
 
 * My own Emacs functions
+** WM Open emacs config
+#+begin_src emacs-lisp
+  (setq keo/configs '(("emacs" . "~/.dotfiles/config/emacs/Emacs.org")
+                      ("herbstluft" . "~/.dotfiles/config/herbstluftwm/autostart")))
+  (defun keo/wm-open-config (config)
+    (select-frame (make-frame '((name . "Emacs-Config"))))
+    (find-file (cdr (assoc config keo/configs)))
+    (delete-other-windows))
+
+  ;; (keo/wm-open-config "herbstluft")
+#+end_src
+
 ** Proxmox
 #+begin_src emacs-lisp
   (defvar proxmox-base-url "https://proxmox.kimane.se/api2/json")
