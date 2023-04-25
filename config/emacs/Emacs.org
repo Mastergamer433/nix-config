@@ -1228,12 +1228,23 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 * My own Emacs functions
 ** WM Open emacs config
 #+begin_src emacs-lisp
-  (setq keo/configs '(("emacs" . "~/.dotfiles/config/emacs/Emacs.org")
-                      ("herbstluft" . "~/.dotfiles/config/herbstluftwm/autostart")))
+  (setq keo/configs `(("emacs" . ("~/.dotfiles/config/emacs/Emacs.org"))
+                      ("herbstluft" . ("~/.dotfiles/config/herbstluftwm/autostart"))
+                      ("fish" . (,(format "~/.dotfiles/hosts/%s/default.nix" (system-name)) ,9))))
+
   (defun keo/wm-open-config (config)
     (select-frame (make-frame '((name . "Emacs-Config"))))
-    (find-file (cdr (assoc config keo/configs)))
-    (delete-other-windows))
+    (find-file (car (cdr (assoc config keo/configs))))
+    (let ((line (cl-first (cddr (assoc config keo/configs))))
+          (regex (cl-first (cdddr (assoc config keo/configs)))))
+      (if line
+          (goto-line line))
+      (if regex
+          (progn
+            (beginning-of-buffer)
+            (search-forward-regexp regex))))
+      (delete-other-windows))
+  (keo/wm-open-config "emacs")
 
   ;; (keo/wm-open-config "herbstluft")
 #+end_src
@@ -1247,6 +1258,7 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
         (format " %s" (string-trim mail-count)))
       ""))
 #+end_src
+
 ** Proxmox
 #+begin_src emacs-lisp
   (defvar proxmox-base-url "https://proxmox.kimane.se/api2/json")
@@ -1330,6 +1342,7 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 
   (message "%s" (proxmox-select-vm (proxmox-get-vms)))
 #+end_src
+
 ** Org agenda
 I wanna have a function to open org agenda in a new frame with another instance name som my window manager can manage the placement of the window.
 #+begin_src emacs-lisp
@@ -1349,6 +1362,7 @@ I wanna have a function to open org agenda in a new frame with another instance 
     (find-file "~/.dotfiles/config/herbstluftwm/autostart")
     (delete-other-windows))
 #+end_src
+
 ** Awesomewm denote new note
 #+begin_src emacs-lisp
   (defun keo/awesomewm-denote-new-note ()
