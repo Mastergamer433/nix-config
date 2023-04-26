@@ -34,6 +34,7 @@ hc keybind $Mod-q close
 hc keybind $Mod-Return spawn $myTerm
 hc keybind $appMod-Control-Return spawn  ./xmenu/xmenu.sh
 hc keybind $Mod-t spawn slock
+hc keybind $appMod-p spawn emacsclient -e "(keo/wm-open-project)"
 hc keybind $appMod-k spawn xdotool type "2K\@5246\%\$3\#\@2\$\$24k"
 configKeys=( e h )
 
@@ -44,8 +45,8 @@ for k in "${configKeys[@]}" Escape ; do
 done
 hc keybind $appMod-c chain \
     '->' spawn notify-send "Select a workspace number or press Escape" \
-    '->' keybind "${configKeys[0]}" chain "${configKeysUnbind[@]}" , spawn $myEmacsConfigCommand \
-    '->' keybind "${configKeys[0]}" chain "${configKeysUnbind[@]}" , spawn $myHerbstfluftConfigCommand\
+    '->' keybind "${configKeys[0]}" chain "${configKeysUnbind[@]}" , spawn emacsclient -e "(keo/wm-open-config \"emacs\")" \
+    '->' keybind "${configKeys[1]}" chain "${configKeysUnbind[@]}" , spawn emacsclient -e "(keo/wm-open-config \"herbstluft\")" \
     '->' keybind Escape             chain "${unbind[@]}"
 # Start rofi
 hc keybind $Mod-d spawn rofi -show run

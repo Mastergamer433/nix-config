@@ -14,11 +14,9 @@ Clean up Emacs' user interface, I like it being more minimal.
   (menu-bar-mode -1)          ; Disable the menu bar
 
   ;; Set up the visible bell
-  (setq visible-bell nil)
-
-
-
+  (setq visible-bell t)
 #+end_src
+
 Improve scrolling
 #+begin_src emacs-lisp
   (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))
@@ -562,8 +560,8 @@ Projectile
     :bind-keymap
     ("C-c p" . projectile-command-map)
     :init
-    (when (file-directory-p "~/Projects/Code")
-      (setq projectile-project-search-path '("~/Projects/Code")))
+    (when (file-directory-p "~/Projects")
+      (setq projectile-project-search-path '("~/Projects")))
     (setq projectile-switch-project-action #'dw/switch-project-action))
 
   (use-package counsel-projectile
@@ -1141,6 +1139,11 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
     (setq which-key-idle-delay 0))
 #+end_src
 
+** Hydra
+#+begin_src emacs-lisp
+  (use-package hydra)
+#+end_src
+
 ** Evil
 #+begin_src emacs-lisp
   (use-package evil
@@ -1215,6 +1218,41 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
   (use-package request)
 #+end_src
 
+** S
+#+begin_src emacs-lisp
+  (use-package s)
+#+end_src
+
+** ht
+#+begin_src emacs-lisp
+  (use-package ht)
+#+end_src
+
+** ov
+#+begin_src emacs-lisp
+  (use-package ov)
+#+end_src
+
+** websocket
+#+begin_src emacs-lisp
+  (use-package websocket)
+#+end_src
+
+** ts
+#+begin_src emacs-lisp
+  (use-package ts)
+#+end_src
+
+** f
+#+begin_src emacs-lisp
+  (use-package f)
+#+end_src
+
+** jeison
+#+begin_src emacs-lisp
+  (use-package jeison)
+#+end_src
+
 * Databases
 #+begin_src emacs-lisp
   (setq emacs-db (emacsql-mysql "harry_potter_emacs" :user "harry_potter_emacs"
@@ -1226,27 +1264,90 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 #+end_src
 
 * My own Emacs functions
-** WM Open emacs config
+** Remove final newline from string
+#+begin_src emacs-lisp
+  (defun keo/string-trim-final-newline (string)
+    (let ((len (length string)))
+      (cond ((and (> len 0)
+                  (eql
+                   (aref string (- len 1))
+                   ?\n))
+             (substring string 0 (- len 1)))
+            (t string))))
+#+end_src
+
+** WM Get all clients
+#+begin_src emacs-lisp
+  (defun keo/wm-get-all-clients ()
+    (string-split
+     (keo/string-trim-final-newline
+      (shell-command-to-string "herbstclient attr clients | grep 0x"))))
+#+end_src
+
+** WM get title of client
+#+begin_src emacs-lisp
+  (defun keo/wm-get-title-of-client (client)
+    (keo/string-trim-final-newline
+     (shell-command-to-string (format "herbstclient attr clients.%s | grep title | cut -d'\"' -f2" client))))
+#+end_src
+
+** WM get title of all clients
+#+begin_src emacs-lisp
+  (defun keo/wm-get-title-of-all-clients ()
+    (let ((titles (list))
+          (clients (keo/wm-get-all-clients)))
+      (mapcar 
+       (lambda (c)
+         (push (keo/string-trim-final-newline (keo/wm-get-title-of-client c)) titles))
+       clients)
+      titles))
+#+end_src
+
+** WM Open config
 #+begin_src emacs-lisp
   (setq keo/configs `(("emacs" . ("~/.dotfiles/config/emacs/Emacs.org"))
                       ("herbstluft" . ("~/.dotfiles/config/herbstluftwm/autostart"))
                       ("fish" . (,(format "~/.dotfiles/hosts/%s/default.nix" (system-name)) ,9))))
 
   (defun keo/wm-open-config (config)
-    (select-frame (make-frame '((name . "Emacs-Config"))))
-    (find-file (car (cdr (assoc config keo/configs))))
-    (let ((line (cl-first (cddr (assoc config keo/configs))))
-          (regex (cl-first (cdddr (assoc config keo/configs)))))
-      (if line
-          (goto-line line))
+    (select-frame
+     (make-frame
+      '((name . "Emacs-Config"))))
+    (find-file
+     (car (cdr (assoc config keo/configs))))
+    (let ((line (cl-first
+                 (cddr
+                  (assoc config keo/configs))))
+          (regex (cl-first
+                  (cdddr
+                   (assoc config keo/configs)))))
+      (if line (goto-line line))
       (if regex
           (progn
             (beginning-of-buffer)
             (search-forward-regexp regex))))
-      (delete-other-windows))
+    (delete-other-windows))
   (keo/wm-open-config "emacs")
 
   ;; (keo/wm-open-config "herbstluft")
+#+end_src
+
+** WM Open Project
+#+begin_src emacs-lisp
+  (defun keo/wm-open-project ()
+    (select-frame
+     (make-frame
+      '((name . "Project"))))
+    (projectile-switch-project-by-name
+     (keo/string-trim-final-newline
+      (shell-command-to-string
+       (format
+        "echo \"%s\" | rofi -dmenu"
+        (string-join
+         projectile-known-projects
+         "\n")))))
+    (delete-other-windows))
+  (keo/wm-open-project)
 #+end_src
 
 ** Mail count
