@@ -1264,6 +1264,35 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 #+end_src
 
 * My own Emacs functions
+** Find File Mysql
+#+begin_src emacs-lisp
+  (defun uuid-create ()
+    "Return a newly generated UUID. This uses a simple hashing of variable data."
+    (let ((s (md5 (format "%s%s%s%s%s%s%s%s%s%s"
+                          (user-uid)
+                          (emacs-pid)
+                          (system-name)
+                          (user-full-name)
+                          user-mail-address
+                          (current-time)
+                          (emacs-uptime)
+                          (garbage-collect)
+                          (random)
+                          (recent-keys)))))
+      (format "%s-%s-3%s-%s-%s"
+              (substring s 0 8)
+              (substring s 8 12)
+              (substring s 13 16)
+              (substring s 16 20)
+              (substring s 20 32))))
+
+  (defun find-file-mysql ()
+      (emacsql emacs-db [:insert :into files
+                         :values ([$s1 $s2 $s3])]
+              (uuid-create) (buffer-file-name) (s-trim (shell-command-to-string "date --rfc-email"))))
+
+  (add-hook 'find-file-hook 'find-file-mysql)
+#+end_src
 ** Remove final newline from string
 #+begin_src emacs-lisp
   (defun keo/string-trim-final-newline (string)
@@ -1474,8 +1503,10 @@ I wanna have a function to open org agenda in a new frame with another instance 
 
 ** Awesomewm new client
 #+begin_src emacs-lisp
-  ;;(emacsql awesomewm-db [:create-table clients
-  ;;           ([(id integer :primary-key) name class])])
+  ;;(emacsql emacs-db [:create-table files
+  ;;           ([id name date])])
+
+  ;;(emacsql emacs-db [:drop-table files])
 
   (cl-defun keo/awesomewm-new-client (&key id name class)
     (emacsql awesomewm-db [:insert :into clients 

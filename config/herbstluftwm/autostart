@@ -24,9 +24,15 @@ myTerm=alacritty                    # Set my preferred terminal.
 myEditor="emacsclient -c -a emacs"  # Set my preferred editor.
 myIrcClient="emacsclient -c -a emacs -e (erc)"  # Set my preferred irc client.
 myConfigEditor="emacsclient -e (keo/new-config-frame)"  # Set my preferred editor for editing configs.
-myEmacsConfigCommand="emacsclient -e \"(keo/wm-open-config \\\"emacs\\\")\"" 
+myEmacsConfigCommand="emacsclient -e (keo/wm-open-config \"emacs\")" 
 myHerbstluftConfigCommand="emacsclient -e \"(keo/wm-open-config \\\"herbstluft\\\")\"" 
 myBrowser=firefox  # Set my preferred web browser.
+myScratchpadCommand=~/.config/herbstluftwm/scratchpads.sh
+~/.config/herbstluftwm/scratchpads.sh term-scratchpad
+~/.config/herbstluftwm/scratchpads.sh spotify-scratchpad
+
+hc spawn ~/.config/herbstluftwm/exec_on_tag.sh spotify-scratchpad spotify
+hc spawn ~/.config/herbstluftwm/exec_on_tag.sh term-scratchpad $myTerm
 
 hc keybind $Mod-Shift-e quit
 hc keybind $Mod-r reload
@@ -34,20 +40,16 @@ hc keybind $Mod-q close
 hc keybind $Mod-Return spawn $myTerm
 hc keybind $appMod-Control-Return spawn  ./xmenu/xmenu.sh
 hc keybind $Mod-t spawn slock
+hc keybind $Mod-n spawn emacsclient -e "(keo/wm-switch-window)"
 hc keybind $appMod-p spawn emacsclient -e "(keo/wm-open-project)"
 hc keybind $appMod-k spawn xdotool type "2K\@5246\%\$3\#\@2\$\$24k"
-configKeys=( e h )
 
-# Build the command to unbind the keys
-configKeysUnbind=(  )
-for k in "${configKeys[@]}" Escape ; do
-    configKeysUnbind+=( , keyunbind "$k" )
-done
-hc keybind $appMod-c chain \
-    '->' spawn notify-send "Select a workspace number or press Escape" \
-    '->' keybind "${configKeys[0]}" chain "${configKeysUnbind[@]}" , spawn emacsclient -e "(keo/wm-open-config \"emacs\")" \
-    '->' keybind "${configKeys[1]}" chain "${configKeysUnbind[@]}" , spawn emacsclient -e "(keo/wm-open-config \"herbstluft\")" \
-    '->' keybind Escape             chain "${unbind[@]}"
+~/.config/herbstluftwm/keychords/dired.sh
+~/.config/herbstluftwm/keychords/config.sh
+~/.config/herbstluftwm/keychords/scratchpad.sh
+~/.config/herbstluftwm/keychords/web.sh
+~/.config/herbstluftwm/keychords/media.sh
+
 # Start rofi
 hc keybind $Mod-d spawn rofi -show run
 
@@ -176,6 +178,7 @@ hc rule class=VirtualBox pseudotile=on
 hc rule class=VirtualBox fullscreen=on
 hc rule instance=mpvFullscreen fullscreen=on
 hc rule instance=Emacs-Config floating=on floatplacement=center
+hc rule instance=Emacs-Dired floating=on floatplacement=center
 hc rule instance=Config class=Emacs tag=config
 hc rule focus=on # normally focus new clients
 #hc rule focus=off # normally do not focus new clients
