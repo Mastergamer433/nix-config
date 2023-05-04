@@ -1391,88 +1391,181 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 
 ** Proxmox
 #+begin_src emacs-lisp
-  (defvar proxmox-base-url "https://proxmox.kimane.se/api2/json")
 
-  (cl-defun proxmox-display-vms (data)
-    (let ((i 0)
-          (len (length (assoc-default 'data data)))
-          (body (assoc-default 'data data))
-          (buffer (get-buffer-create "*Proxmox-VMs*")))
-      (with-current-buffer buffer
-        (erase-buffer)
-        (while (< i len)
-          (insert "Name: " (assoc-default 'name (aref body i)))
-          (insert " Cpu Usage: " (format "%s" (* 1000 (assoc-default 'cpu (aref body i)))))
-          (insert "\n")
-          (setq i (1+ i)))
-        (display-buffer buffer))))
+  (defvar proxmox-base-url "https://proxmox.kimane.se/api2/json")
 
   (defun proxmox-get-vms ()
     (interactive)
     (defvar vms)
     (request (format "%s/nodes/pve/qemu" proxmox-base-url)
       :headers `(("Authorization" . ,(format "PVEAPIToken=%s" (password-store-get "proxmox/api"))))
-      :parser 'json-read
+      :parser (lambda () (buffer-string))
       :success (cl-function
                 (lambda (&key data &allow-other-keys)
                   (setq vms data))))
     vms)
 
-  (defun proxmox-select-vm (vms)
-    (let ((names '())
-          (vm "")
-          (res '())
-          (i 0)
-          (body (assoc-default 'data vms))
-          (len (length (assoc-default 'data vms))))
-      (while (< i len)
-        (setq names (append names (list (assoc-default 'name (aref body i)))))
-        (setq i (1+ i)))
-      (setq vm (completing-read
-                "Select VM"
-                names
-                nil
-                t))
-      (setq i 0)
-      (while (< i len)
-        (if (string= vm (format "%s" (assoc-default 'name (aref body i))))
-            (setq res (aref body i)))
-        (setq i (1+ i)))
-      res))
+  (defun proxmox-get-vm-by-name (name)
+    (let* ((vms (jeison-read t (proxmox-get-vms) "data"))
+           (VM (list)))
+      (mapcar
+       (lambda (vm)
+         (if (equal name (jeison-read t vm "name"))
+             (setq VM vm)))
+       vms)
+      VM))
 
-  (defun proxmox-clone-vm (vm-id new-id new-name)
-    (request (format "%s/node/pve/qemu/%s/clone" proxmox-base-url vm-id)
-      :type "POST"
-      :data `(("newid" . ,new-id) ("node" . "pve") ("vmid" . ,vm-id) ("name" . ,new-name) ("full" . "true"))
+  (defun proxmox-get-vm-by-name (vmid)
+    (let* ((vms (jeison-read t (proxmox-get-vms) "data"))
+           (VM (list)))
+      (mapcar
+       (lambda (vm)
+         (if (equal vmid (jeison-read t vm "vmid"))
+             (setq VM vm)))
+       vms)
+      VM))
+
+  (defun proxmox-get-vm-names ()
+    (let* ((vms (jeison-read t (proxmox-get-vms) "data")))
+      (mapcar
+       (lambda (vm)
+         (jeison-read t vm "name"))
+       vms)))
+
+  (defun proxmox-select-a-vm ()
+    (proxmox-get-vm-by-name (completing-read "VM: " (proxmox-get-vm-names))))
+
+  (defun proxmox-clone-vm ()
+    (interactive)
+    (let* ((vmid (jeison-read t (proxmox-select-a-vm) "vmid")))
+      (request (format "%s/nodes/pve/qemu/%s/clone" proxmox-base-url vmid)
+        :type "POST"
+        :headers `(("Authorization" . ,(format "PVEAPIToken=%s" (password-store-get "proxmox/api"))))
+        :params `(("full" . "1") ("newid" . ,(completing-read "New vm's id: " ())) ("name" . ,(completing-read "New vm's name: " ())))
+        :success (cl-function
+                  (lambda (&key data &allow-other-keys)
+                    (message "I sent: %S" (assoc-default 'form data)))))
+      vmid))
+
+  (defun proxmox-power-off-vm (&optional vmid)
+    (interactive)
+    (let* ((vmid (if vmid vmid (jeison-read t (proxmox-select-a-vm) "vmid"))))
+      (request (format "%s/nodes/pve/qemu/%s/status/stop" proxmox-base-url vmid)
+        :type "POST"
+        :headers `(("Authorization" . ,(format "PVEAPIToken=%s" (password-store-get "proxmox/api"))))
+        :success (cl-function
+                  (lambda (&key data &allow-other-keys)
+                    (message "I sent: %S" (assoc-default 'form data)))))))
+
+  (defun proxmox-power-on-vm (&optional vmid)
+    (interactive)
+    (let* ((vmid (if vmid vmid (jeison-read t (proxmox-select-a-vm) "vmid"))))
+      (request (format "%s/nodes/pve/qemu/%s/status/start" proxmox-base-url vmid)
+        :type "POST"
+        :headers `(("Authorization" . ,(format "PVEAPIToken=%s" (password-store-get "proxmox/api"))))
+        :success (cl-function
+                  (lambda (&key data &allow-other-keys)
+                    (message "I sent: %S" (assoc-default 'form data)))))))
+
+  (defun proxmox-restart-vm (&optional vmid)
+    (interactive)
+    (let* ((vmid (if vmid vmid (jeison-read t (proxmox-select-a-vm) "vmid"))))
+      (request (format "%s/nodes/pve/qemu/%s/status/reboot" proxmox-base-url vmid)
+        :type "POST"
+        :headers `(("Authorization" . ,(format "PVEAPIToken=%s" (password-store-get "proxmox/api"))))
+        :success (cl-function
+                  (lambda (&key data &allow-other-keys)
+                    (message "I sent: %S" (assoc-default 'form data)))))))
+
+  (defun proxmox-get-ip (vmid)
+    (defvar ifs)
+    (defvar IF)
+    (defvar IP)
+    (request (format "%s/nodes/pve/qemu/%s/agent/network-get-interfaces" proxmox-base-url vmid)
       :headers `(("Authorization" . ,(format "PVEAPIToken=%s" (password-store-get "proxmox/api"))))
-      :parser 'json-read
+      :parser (lambda () (buffer-string))
       :success (cl-function
                 (lambda (&key data &allow-other-keys)
-                  (message "Success")))))
-  (defun proxmox-next-vm-id (vms)
-    (let ((i 0)
-          (body (assoc-default 'data vms))
-          (len (length (assoc-default 'data vms)))
-          (id 0))
-      (while (< i len)
-        (cond ((and (< id (assoc-default 'vmid (aref body i)))
-                    (not (= id 1000)))
-               (setq id (assoc-default 'vmid (aref body i)))))
-        (setq i (1+ i)))
-      id))
-  (cl-defun proxmox-clone ()
-    (interactive)
-    (let ((vm (proxmox-select-vm (proxmox-get-vms))))
-      (proxmox-clone-vm (assoc-default 'vmid vm) (proxmox-next-vm-id (proxmox-get-vms)) (completing-read "New vm name: " (list)))))
-  ;; (((body (assoc-default 'data data))))
+                  (setq ifs data))))
+    (mapcar
+     (lambda (if)
+       (if (equal "eth0" (jeison-read t if "name"))
+           (setq IF if)))
+     (jeison-read t (jeison-read t ifs "data") "result"))
 
-  (proxmox-display-vms (proxmox-get-vms))
-  (message "%s" (proxmox-get-vms))
-  (proxmox-get-vms)
+    (mapcar
+     (lambda (ip)
+       (if (equal "ipv4" (jeison-read t ip "ip-address-type"))
+           (setq IP (jeison-read t ip "ip-address"))))
+     (jeison-read t IF "ip-addresses"))
+    IP)
 
-  (message "%s" (proxmox-select-vm (proxmox-get-vms)))
+  (proxmox-get-ip "3000")
+  (proxmox-restart-vm)
+  (proxmox-get-vm-by-name "proxy.kimane.se")
 #+end_src
 
+** pfSense
+#+begin_src emacs-lisp
+  (setq shell-file-name "bash")
+  (setq pfsense-base-url "https://pfsense.kimane.se:9123/fauxapi/v1/?action=")
+
+  (defun pfsense-fauxapi-auth (fauxapi_apikey fauxapi_apisecret)
+    (setq fauxapi_timestamp
+          (s-trim
+           (shell-command-to-string
+            "date -u +%Y%m%dZ%H%M%S")))
+    (setq fauxapi_nonce
+          (s-trim
+           (shell-command-to-string
+            "head -c 40 /dev/urandom | (md5sum 2>/dev/null  || md5 2>/dev/null) | head -c 8")))
+    (setq fauxapi_hash
+          (s-trim
+           (shell-command-to-string
+            (format
+             "echo -n %s%s%s | (sha256sum 2>/dev/null  || shasum -a 256 2>/dev/null) | cut -d' ' -f1"
+             fauxapi_apisecret
+             fauxapi_timestamp
+             fauxapi_nonce))))
+    (setq fauxapi_auth
+          (format
+           "%s:%s:%s:%s"
+           fauxapi_apikey
+           fauxapi_timestamp
+           fauxapi_nonce
+           fauxapi_hash))
+    fauxapi_auth)
+
+  (defun pfsense-gateway-status ()
+    (defvar status)
+    (request
+      (format
+       "%sgateway_status"
+       pfsense-base-url)
+      :headers `(("fauxapi-auth" . ,(pfsense-fauxapi-auth
+                                     "PFFAMy4j8IuCv5VYsJFcsfQj"
+                                     "rWLYcZtv7WfmevCWegzswr09AZp1so1Zi83v8vyP7ycGiQQzXPuW0Gyfv4ym")))
+      :success (cl-function
+                (lambda (&key data &allow-other-keys)
+                  (setq status
+                        (jeison-read t data "data")))))
+    status)
+
+  (defun pfsense-firewall-nat-new (source-if dest-ip dest-port)
+    (defvar rules)
+    (request
+      (format
+       "%sconfig_get"
+       pfsense-base-url)
+      :headers `(("fauxapi-auth" . ,(pfsense-fauxapi-auth
+                                     "PFFAMy4j8IuCv5VYsJFcsfQj"
+                                     "rWLYcZtv7WfmevCWegzswr09AZp1so1Zi83v8vyP7ycGiQQzXPuW0Gyfv4ym")))
+      :success (cl-function
+                (lambda (&key data &allow-other-keys)
+                  (message "%s"
+                           (jeison-read t (jeison-read t (jeison-read t data "data") "config") "nat")))))
+    rules)
+#+end_src
 ** Org agenda
 I wanna have a function to open org agenda in a new frame with another instance name som my window manager can manage the placement of the window.
 #+begin_src emacs-lisp
