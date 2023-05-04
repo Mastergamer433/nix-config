@@ -510,6 +510,10 @@ display-time-world command provides a nice display of the time at a specified li
   (setq window-manager-wallpaper-path "~/.wallpapers/nixos.png")
 #+end_src
 
+** Hooks
+#+begin_src emacs-lisp
+#+end_src
+
 * Keep Folders Clean
 #+begin_src emacs-lisp
   (setq backup-directory-alist `(("." . ,(expand-file-name "tmp/backups/" user-emacs-directory))))
@@ -811,13 +815,13 @@ Projectile
 
   (defun keo/go-to-inbox ()
     (interactive)
-    (mu4e-headers-search dw/mu4e-inbox-query))
+    (mu4e-headers-search keo/mu4e-inbox-query))
 
   (use-package mu4e-alert
     :after mu4e
     :config
     ;; Show unread emails from all inboxes
-    (setq mu4e-alert-interesting-mail-query dw/mu4e-inbox-query)
+    (setq mu4e-alert-interesting-mail-query keo/mu4e-inbox-query)
 
     ;; Show notifications for mails already notified
     (setq mu4e-alert-notify-repeated-mails nil)
