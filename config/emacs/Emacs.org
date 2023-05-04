@@ -481,6 +481,16 @@ display-time-world command provides a nice display of the time at a specified li
 #+end_src
 
 * Window Management
+** Dynamic Window Management with edwina
+#+begin_src emacs-lisp
+  (use-package edwina
+    :config
+    (setq display-buffer-base-action '(display-buffer-below-selected))
+    (edwina-setup-dwm-keys)
+    (edwina-mode 1))
+
+#+end_src
+
 ** Window Selection with ace-window
 #+begin_src emacs-lisp
   (use-package ace-window
@@ -1355,11 +1365,7 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
            (user (when prompt-for-everything (keo/wm-ask '() "Repo Name")))
            (path (mapconcat 'identity `(,owner ,user) "/")))
       (browse-url (format "https://github.com/%s" path))
-<<<<<<< Updated upstream
       (keo/wm-goto-workspace "www")))
-=======
-      (shell-command-to-string "herbstclient use www")))
->>>>>>> Stashed changes
 #+end_src
 
 *** Get all clients
@@ -1730,6 +1736,7 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
                            (jeison-read t (jeison-read t (jeison-read t data "data") "config") "nat")))))
     rules)
 #+end_src
+
 ** Org agenda
 I wanna have a function to open org agenda in a new frame with another instance name som my window manager can manage the placement of the window.
 #+begin_src emacs-lisp
