@@ -200,58 +200,58 @@ display-time-world command provides a nice display of the time at a specified li
 
 ** Completions in Regions with Corfu
 #+begin_src emacs-lisp
-    ;; Enable Corfu completion UI
-    ;; See the Corfu README for more configuration tips.
-    (use-package corfu
-      :bind (("TAB" . corfu-insert))
-      :custom
-      (corfu-auto t)
-      (corfu-echo-documentation nil)
-      :init
-      (global-corfu-mode))
+  ;; Enable Corfu completion UI
+  ;; See the Corfu README for more configuration tips.
+  (use-package corfu
+    :bind (("TAB" . corfu-insert))
+    :custom
+    (corfu-auto t)
+    (corfu-echo-documentation nil)
+    :init
+    (global-corfu-mode))
 
-    ;; Disable auto completion-at-point for some modes.
-    (dolist (mode '(term-mode-hook
-                    shell-mode-hook
-                    eshell-mode-hook
-                    lsp-mode-hook))
-      (add-hook mode (lambda () (setq-local corfu-auto nil))))
+  ;; Disable auto completion-at-point for some modes.
+  (dolist (mode '(term-mode-hook
+                  shell-mode-hook
+                  eshell-mode-hook
+                  lsp-mode-hook))
+    (add-hook mode (lambda () (setq-local corfu-auto nil))))
 
-    ;; Add extensions
-    (use-package cape
-      ;; Bind dedicated completion commands
-      ;; Alternative prefix keys: C-c p, M-p, M-+, ...
-      :bind (("C-c c p" . completion-at-point) ;; capf
-             ("C-c c t" . complete-tag)        ;; etags
-             ("C-c c d" . cape-dabbrev)        ;; or dabbrev-completion
-             ("C-c c h" . cape-history)
-             ("C-c c f" . cape-file)
-             ("C-c c k" . cape-keyword)
-             ("C-c c s" . cape-symbol)
-             ("C-c c a" . cape-abbrev)
-             ("C-c c i" . cape-ispell)
-             ("C-c c l" . cape-line)
-             ("C-c c w" . cape-dict)
-             ("C-c c \\" . cape-tex)
-             ("C-c c _" . cape-tex)
-             ("C-c c ^" . cape-tex)
-             ("C-c c &" . cape-sgml)
-             ("C-c c r" . cape-rfc1345))
-      :init
-      ;; Add `completion-at-point-functions', used by `completion-at-point'.
-      (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-      (add-to-list 'completion-at-point-functions #'cape-file)
-      ;;(add-to-list 'completion-at-point-functions #'cape-history)
-      ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
-      ;;(add-to-list 'completion-at-point-functions #'cape-tex)
-      ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
-      ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
-      ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
-      ;;(add-to-list 'completion-at-point-functions #'cape-ispell)
-      ;;(add-to-list 'completion-at-point-functions #'cape-dict)
-      ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
-      ;;(add-to-list 'completion-at-point-functions #'cape-line)
-      )
+  ;; Add extensions
+  (use-package cape
+    ;; Bind dedicated completion commands
+    ;; Alternative prefix keys: C-c p, M-p, M-+, ...
+    :bind (("C-c c p" . completion-at-point) ;; capf
+           ("C-c c t" . complete-tag)        ;; etags
+           ("C-c c d" . cape-dabbrev)        ;; or dabbrev-completion
+           ("C-c c h" . cape-history)
+           ("C-c c f" . cape-file)
+           ("C-c c k" . cape-keyword)
+           ("C-c c s" . cape-symbol)
+           ("C-c c a" . cape-abbrev)
+           ("C-c c i" . cape-ispell)
+           ("C-c c l" . cape-line)
+           ("C-c c w" . cape-dict)
+           ("C-c c \\" . cape-tex)
+           ("C-c c _" . cape-tex)
+           ("C-c c ^" . cape-tex)
+           ("C-c c &" . cape-sgml)
+           ("C-c c r" . cape-rfc1345))
+    :init
+    ;; Add `completion-at-point-functions', used by `completion-at-point'.
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+    (add-to-list 'completion-at-point-functions #'cape-file)
+    ;;(add-to-list 'completion-at-point-functions #'cape-history)
+    ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
+    ;;(add-to-list 'completion-at-point-functions #'cape-tex)
+    ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
+    ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
+    ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
+    ;;(add-to-list 'completion-at-point-functions #'cape-ispell)
+    ;;(add-to-list 'completion-at-point-functions #'cape-dict)
+    ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
+    ;;(add-to-list 'completion-at-point-functions #'cape-line)
+    )
 #+end_src
 ** Consult Commands
 #+begin_src emacs-lisp
@@ -446,24 +446,13 @@ display-time-world command provides a nice display of the time at a specified li
          (funcall #',split-type)
          (call-interactively #',fn))))
 
-  (define-key embark-file-map     (kbd "o") (my/embark-ace-action find-file))
-  (define-key embark-buffer-map   (kbd "o") (my/embark-ace-action switch-to-buffer))
-  (define-key embark-bookmark-map (kbd "o") (my/embark-ace-action bookmark-jump))
-
-  (define-key embark-file-map     (kbd "2") (my/embark-split-action find-file split-window-below))
-  (define-key embark-buffer-map   (kbd "2") (my/embark-split-action switch-to-buffer split-window-below))
-  (define-key embark-bookmark-map (kbd "2") (my/embark-split-action bookmark-jump split-window-below))
-
-  (define-key embark-file-map     (kbd "3") (my/embark-split-action find-file split-window-right))
-  (define-key embark-buffer-map   (kbd "3") (my/embark-split-action switch-to-buffer split-window-right))
-  (define-key embark-bookmark-map (kbd "3") (my/embark-split-action bookmark-jump split-window-right))
-  (define-key embark-file-map     (kbd "S") 'sudo-find-file)
 
   (use-package embark
     :bind
     (("C-." . embark-act)         ;; pick some comfortable binding
      ("C-;" . embark-dwim)        ;; good alternative: M-.
      ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+   
     :init
     ;; Optionally replace the key help with a completing-read interface
     (setq prefix-help-command #'embark-prefix-help-command)
@@ -478,6 +467,19 @@ display-time-world command provides a nice display of the time at a specified li
   (use-package embark-consult
     :hook
     (embark-collect-mode . consult-preview-at-point-mode))
+
+  (define-key embark-file-map     (kbd "o") (my/embark-ace-action find-file))
+  (define-key embark-buffer-map   (kbd "o") (my/embark-ace-action switch-to-buffer))
+  (define-key embark-bookmark-map (kbd "o") (my/embark-ace-action bookmark-jump))
+
+  (define-key embark-file-map     (kbd "2") (my/embark-split-action find-file split-window-below))
+  (define-key embark-buffer-map   (kbd "2") (my/embark-split-action switch-to-buffer split-window-below))
+  (define-key embark-bookmark-map (kbd "2") (my/embark-split-action bookmark-jump split-window-below))
+
+  (define-key embark-file-map     (kbd "3") (my/embark-split-action find-file split-window-right))
+  (define-key embark-buffer-map   (kbd "3") (my/embark-split-action switch-to-buffer split-window-right))
+  (define-key embark-bookmark-map (kbd "3") (my/embark-split-action bookmark-jump split-window-right))
+  (define-key embark-file-map     (kbd "S") 'sudo-find-file)
 #+end_src
 
 * Window Management
@@ -707,7 +709,7 @@ Projectile
     ;; :custom
     ;; (tempel-trigger-prefix "<")
 
-    :bind (("TAB" . tempel-complete) ;; Alternative tempel-expand
+    :bind (("M-+" . tempel-expand) ;; Alternative tempel-expand
            ("M-*" . tempel-insert))
 
     :init
@@ -727,13 +729,13 @@ Projectile
 
     (add-hook 'prog-mode-hook 'tempel-setup-capf)
     (add-hook 'text-mode-hook 'tempel-setup-capf)
+    (add-hook 'emacs-lisp-mode-hook 'tempel-setup-capf)
 
     ;; Optionally make the Tempel templates available to Abbrev,
     ;; either locally or globally. `expand-abbrev' is bound to C-x '.
     (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
     (global-tempel-abbrev-mode)
   )
-
   (use-package tempel-collection)
 
 #+end_src
