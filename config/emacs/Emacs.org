@@ -488,7 +488,6 @@ display-time-world command provides a nice display of the time at a specified li
     (setq display-buffer-base-action '(display-buffer-below-selected))
     (edwina-setup-dwm-keys)
     (edwina-mode 1))
-
 #+end_src
 
 ** Window Selection with ace-window
@@ -1376,21 +1375,21 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
       (shell-command-to-string "herbstclient attr clients | grep 0x"))))
 #+end_src
 
-*** get title of client
+*** Get title of client
 #+begin_src emacs-lisp
   (defun keo/wm-get-title-of-client (client)
     (s-trim
      (shell-command-to-string (format "herbstclient attr clients.%s | grep title | cut -d'\"' -f2" client))))
 #+end_src
 
-*** get class of client
+*** Get class of client
 #+begin_src emacs-lisp
   (defun keo/wm-get-class-of-client (client)
     (s-trim
      (shell-command-to-string (format "herbstclient attr clients.%s | grep class | cut -d'\"' -f2" client))))
 #+end_src
 
-*** get title of all clients
+*** Get title of all clients
 #+begin_src emacs-lisp
   (defun keo/wm-get-title-of-all-clients ()
     (let ((titles (list))
@@ -1535,7 +1534,7 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
     (delete-other-windows))
 #+end_src
 
-*** denote new note
+*** Denote new note
 #+begin_src emacs-lisp
   (defun keo/wm-denote-new-note ()
     (select-frame (make-frame '((name . "New-Note"))))
@@ -1543,7 +1542,7 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
     (delete-other-windows))
 #+end_src
 
-*** wallpaper
+*** Wallpaper
 #+begin_src emacs-lisp
   (defun keo/wm-wallpaper ()
     window-manager-wallpaper-path)

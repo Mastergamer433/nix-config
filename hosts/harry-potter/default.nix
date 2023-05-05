@@ -26,6 +26,7 @@
       browsers = {
         nyxt.enable = true;
         firefox.enable = true;
+        qutebrowser.enable = true;
         castor.enable = true;
       };
       media = {
