@@ -26,6 +26,7 @@
       browsers = {
         nyxt.enable = true;
         firefox.enable = true;
+        qutebrowser.enable = true;
         castor.enable = true;
       };
       media = {
@@ -96,6 +97,8 @@
   services.openssh.startWhenNeeded = true;
 
   networking.networkmanager.enable = true;
+  networking.networkmanager.insertNameservers = ["192.168.21.228" "1.1.1.1"];
+  networking.networkmanager.dns = "none";
 
   i18n = {
     defaultLocale = "en_US.UTF-8";

@@ -42,7 +42,7 @@ in {
         editor.encoding = "utf-8";
         colors = with config.scheme.withHashtag; {
           # Becomes either 'dark' or 'light', based on your colors!
-          webppage.preferred_color_scheme = "${cfg.themeMode}";
+          webpage.preferred_color_scheme = "${cfg.themeMode}";
           tabs.bar.bg = "${base00}";
           keyhint.fg = "${base05}";
           # ...
