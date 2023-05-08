@@ -1307,6 +1307,11 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 #+end_src
 
 ** WM
+*** Goto heading in emacs config
+#+begin_src emacs-lisp
+
+  
+#+end_src
 *** Window rules
 #+begin_src emacs-lisp
   (setq window-rules
