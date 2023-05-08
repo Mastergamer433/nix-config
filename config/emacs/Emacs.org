@@ -1305,6 +1305,22 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
   (add-hook 'find-file-hook 'find-file-mysql)
 #+end_src
 
+** Goto heading org
+#+begin_src emacs-lisp
+  (defun keo/org-file-jump-to-heading (org-file heading-title)
+    (interactive)
+    (find-file (expand-file-name org-file))
+    (goto-char (point-min))
+    (let ((i 1))
+      (mapcar (lambda (heading)
+                (search-forward (concat (s-repeat i "*") " " heading)))
+              (s-split "/" heading-title)))
+    (org-overview)
+    (org-reveal)
+    (org-show-subtree)
+    (forward-line))
+#+end_src
+
 ** WM
 *** Window rules
 #+begin_src emacs-lisp
@@ -1337,6 +1353,43 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
   (keo/wm-window-rules)
 #+end_src
 
+*** Open heading emacs config
+#+begin_src emacs-lisp
+  (defun keo/wm-open-heading-emacs-config ()
+    (find-file
+     "~/.dotfiles/config/emacs/Emacs.org")
+    (let* ((headings (list)))
+      (org-map-entries
+       (lambda ()
+         (let ((elem (org-element-at-point)))
+           (add-to-list
+            'headings
+            `(,(org-element-property
+                :title elem) . ,(org-format-outline-path
+                (org-get-outline-path t))))))
+       (mapcar
+        (lambda (heading)
+          (setq headings
+                (delq (assoc heading headings)))
+          (setf
+           (car (assoc heading headings))
+           (concat
+            (s-repeat
+             (length
+              (s-split
+               "/"
+               (assoc heading headings)))
+             "*")
+            " "
+            heading)))
+        (mapcar 'car headings))
+       (let* ((heading (keo/wm-ask
+                        (mapcar 'car headings)
+                        "Heading")))
+         (keo/org-file-jump-to-heading
+          "~/.dotfiles/config/emacs/Emacs.org"
+          (assoc heading headings))))))
+#+end_src
 *** Goto workspace
 #+begin_src emacs-lisp
   (defun keo/wm-goto-workspace (workspace)
