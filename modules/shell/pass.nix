@@ -22,6 +22,6 @@ in {
             then [ exts.pass-tomb ]
             else [])))
     ];
-    env.PASSWORD_STORE_DIR = cfg.passwordStoreDir;
+    environment.variables.PASSWORD_STORE_DIR = cfg.passwordStoreDir;
   };
 }

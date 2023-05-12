@@ -49,6 +49,7 @@ hc keybind $appMod-k spawn xdotool type "2K\@5246\%\$3\#\@2\$\$24k"
 ~/.config/herbstluftwm/keychords/scratchpad.sh
 ~/.config/herbstluftwm/keychords/web.sh
 ~/.config/herbstluftwm/keychords/media.sh
+~/.config/herbstluftwm/keychords/ssh.sh
 
 # Start rofi
 hc keybind $Mod-d spawn rofi -show run

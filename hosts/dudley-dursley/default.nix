@@ -56,6 +56,8 @@ zoxide init fish | source
       };
       zoxide.enable = true;
       starship.enable = true;
+      pass.enable = true;
+      gnupg.enable = true;
     };
     services = {
       git = {
@@ -72,12 +74,12 @@ zoxide init fish | source
   ## Local config
   networking.wireguard.interfaces = {
     wg0 = {
-      ips = [ "10.10.10.6/24" ];
+      ips = [ "10.10.10.6/24" "2001:470:de51:1010::6/64" ];
       privateKeyFile = config.age.secrets.wireguard.path;
       peers = [{ # doomemacs
         presharedKey = "XzXU4EkJxrZ2XFxiXuLy30nFo7tRh0/KT0ofys0iXwU=";
         publicKey = "tnwFMErFdkJWUh64+9n2e5K/SSIQoD1VNBfxYdIK3kg=";
-        allowedIPs = [ "10.10.10.0/24" ];
+        allowedIPs = [ "10.10.10.0/24" "::/0" ];
         endpoint = "kimane.se:51820";
         persistentKeepalive = 25;
       }];

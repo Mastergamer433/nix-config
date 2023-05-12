@@ -856,9 +856,8 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 #+begin_src emacs-lisp
   (use-package erc
     :ensure nil
-    :config
+    :config)
 
-    )
   (keo/leader-keys
     "e" '(:ignore t :which-key "ERC")
     "ej" '(lambda () (interactive)
@@ -1266,12 +1265,14 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 
 * Databases
 #+begin_src emacs-lisp
-  (setq emacs-db (emacsql-mysql "harry_potter_emacs" :user "harry_potter_emacs"
-                                :password ""
-                                :host "192.168.21.228"))
-  (setq awesomewm-db (emacsql-mysql "harry_potter_awesomewm" :user "harry_potter_awesomewm"
-                                    :password ""
-                                    :host "192.168.21.228"))
+  (if (equal (system-name) "harry-potter")
+      (progn
+        (setq emacs-db (emacsql-mysql "harry_potter_emacs" :user "harry_potter_emacs"
+                                      :password ""
+                                      :host "192.168.21.228"))
+        (setq awesomewm-db (emacsql-mysql "harry_potter_awesomewm" :user "harry_potter_awesomewm"
+                                          :password ""
+                                          :host "192.168.21.228"))))
 #+end_src
 
 * My own Emacs functions
@@ -1363,38 +1364,22 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
   (defun keo/wm-open-heading-emacs-config ()
     (find-file
      "~/.dotfiles/config/emacs/Emacs.org")
+    (goto-char 1)
     (let* ((headings (list)))
       (org-map-entries
        (lambda ()
          (let ((elem (org-element-at-point)))
            (add-to-list
             'headings
-            `(,(org-element-property
-                :title elem) . ,(org-format-outline-path
-                (org-get-outline-path t))))))
-       (mapcar
-        (lambda (heading)
-          (setq headings
-                (delq (assoc heading headings)))
-          (setf
-           (car (assoc heading headings))
-           (concat
-            (s-repeat
-             (length
-              (s-split
-               "/"
-               (assoc heading headings)))
-             "*")
-            " "
-            heading)))
-        (mapcar 'car headings))
-       (let* ((heading (keo/wm-ask
-                        (mapcar 'car headings)
-                        "Heading")))
-         (keo/org-file-jump-to-heading
-          "~/.dotfiles/config/emacs/Emacs.org"
-          (assoc heading headings))))))
+            `(,(s-concat (s-repeat (1- (org-element-property :level elem)) "  ") (org-element-property
+                                                                             :title elem)) . ,(org-format-outline-path
+                                                                                               (org-get-outline-path t)))))))
+      (let ((heading (keo/wm-ask (reverse (mapcar 'car headings)) "Heading" t)))
+        (keo/org-file-jump-to-heading
+        "~/.dotfiles/config/emacs/Emacs.org"
+         (cdr (assoc heading headings))))))
 #+end_src
+
 *** Goto workspace
 #+begin_src emacs-lisp
   (defun keo/wm-goto-workspace (workspace)
@@ -1420,11 +1405,12 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 *** Open Github Repo
 #+begin_src emacs-lisp
   (defun keo/wm-open-github-repo (&optional prompt-for-everything)
+    (interactive)
     (let* ((owner (keo/wm-ask '() (if prompt-for-everything "Repo Owner" "Repo")))
            (user (when prompt-for-everything (keo/wm-ask '() "Repo Name")))
            (path (mapconcat 'identity `(,owner ,user) "/")))
       (browse-url (format "https://github.com/%s" path))
-      (keo/wm-goto-workspace "www")))
+      (keo/wm-goto-window-by-class "Firefox")))
 #+end_src
 
 *** Get all clients
@@ -1536,11 +1522,15 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 
 *** Ask
 #+begin_src emacs-lisp
-  (defun keo/wm-ask (choices &optional prompt)
-    (s-trim (shell-command-to-string
-     (format
-      "echo \"%s\" | rofi -dmenu -p \"%s\""
-      (string-join choices "\n") prompt))))
+  (defun keo/wm-ask (choices &optional prompt trim-newline)
+    (let ((choice (shell-command-to-string
+                   (format
+                    "echo \"%s\" | rofi -dmenu -p \"%s\""
+                    (string-join choices "\n")
+                    prompt))))
+      (if trim-newline
+          (s-trim-right choice)
+        choice)))
 #+end_src
 
 *** Open config
@@ -1852,3 +1842,4 @@ I wanna have a function to open org agenda in a new frame with another instance 
   '" title text)))
   
 #+end_src
+

@@ -14,7 +14,7 @@ in {
       enable = true;
       pinentryFlavor = "qt";
     };
-
+    programs.browserpass.enable = true;
     user.packages = [
       pkgs.tomb
       (let tomb-encrypt =
