@@ -6,7 +6,7 @@
 (menu-bar-mode -1)          ; Disable the menu bar
 
 ;; Set up the visible bell
-(setq visible-bell nil)
+(setq visible-bell t)
 
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))
       mouse-wheel-progressive-speed nil
@@ -304,148 +304,68 @@
   :init
   (marginalia-mode))
 
-(use-package embark
+(use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 0))
 
-  :bind
-  (("C-." . embark-act)         ;; pick some comfortable binding
-   ("C-;" . embark-dwim)        ;; good alternative: M-.
-   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
-
+(use-package evil
   :init
-
-  ;; Optionally replace the key help with a completing-read interface
-  (setq prefix-help-command #'embark-prefix-help-command)
-
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  (setq evil-want-C-u-scroll t)
+  (setq evil-want-C-i-jump nil)
   :config
+  (evil-mode 1)
+  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
 
-  ;; Hide the mode line of the Embark live/completions buffers
-  (add-to-list 'display-buffer-alist
-               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                 nil
-                 (window-parameters (mode-line-format . none)))))
+  ;; Use visual line motions even outside of visual-line-mode buffers
+  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
 
-;; Consult users will also want the embark-consult package.
-(use-package embark-consult
-  :hook
-  (embark-collect-mode . consult-preview-at-point-mode))
+  (evil-set-initial-state 'messages-buffer-mode 'normal)
+  (evil-set-initial-state 'dashboard-mode 'normal))
 
-(use-package ace-window
-  :bind (("M-o" . ace-window))
-  :custom
-  (aw-scope 'frame)
-  (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-  (aw-minibuffer-flag t)
-  :config
-  (ace-window-display-mode 1))
-
-(use-package winner
-  :ensure nil
+(use-package evil-collection
   :after evil
   :config
-  (winner-mode)
-  (define-key evil-window-map "u" 'winner-undo)
-  (define-key evil-window-map "U" 'winner-redo))
+  (evil-collection-init))
 
-(setq window-manager-wallpaper-path "~/.wallpapers/nixos.png")
+(use-package general
+:config
+(general-create-definer keo/exwm-keyboard
+  :keymaps '(normal insert visual emacs)
+  :prefix "s"
+  :global-prefix "s")
+(general-create-definer keo/leader-keys
+  :keymaps '(normal insert visual emacs)
+  :prefix "SPC"
+  :global-prefix "C-SPC"))
 
-(use-package magit
-  :bind ("C-M-;" . magit-status)
-  :commands (magit-status magit-get-current-branch)
-  :custom
-  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-
-(use-package magit-todos)
-
-(defun dw/switch-project-action ()
-  "Switch to a workspace with the project name and start `magit-status'."
-  ;; TODO: Switch to EXWM workspace 1?
-  (persp-switch (projectile-project-name))
-  (magit-status))
-
-(use-package projectile
-  :diminish projectile-mode
-  :config (projectile-mode)
-  :demand t
-  :bind-keymap
-  ("C-c p" . projectile-command-map)
-  :init
-  (when (file-directory-p "~/Projects/Code")
-    (setq projectile-project-search-path '("~/Projects/Code")))
-  (setq projectile-switch-project-action #'dw/switch-project-action))
-
-(use-package counsel-projectile
-  :after projectile
-  :bind (("C-M-p" . counsel-projectile-find-file))
-  :config
-  (counsel-projectile-mode))
-
-(use-package eglot
-  :bind (:map eglot-mode-map
-              ("C-c C-a" . eglot-code-actions)
-              ("C-c C-r" . eglot-rename))
-  :config
-  (setq eglot-autoshutdown t
-        eglot-confirm-server-initiated-edits nil)
-  (add-to-list 'eglot-server-programs
-               '((js2-mode typescript-mode) . ("typescript-language-server" "--stdio"))))
-
-(use-package dap-mode)
-
-(use-package lispy
-  :hook ((emacs-lisp-mode . lispy-mode)
-         (scheme-mode . lispy-mode)))
-
-(use-package lispyville
-  :hook ((lispy-mode . lispyville-mode))
-  :config
-  (lispyville-set-key-theme '(operators c-w additional
-                                        additional-movement slurp/barf-cp
-                                        prettify)))
-
-(use-package helpful
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-function] . helpful-function)
-  ([remap describe-symbol] . helpful-symbol)
-  ([remap describe-variable] . helpful-variable)
-  ([remap describe-command] . helpful-command)
-  ([remap describe-key] . helpful-key))
-
-(use-package slime
-  :config
-  (setq inferior-lisp-program "sbcl"))
-
-(use-package geiser)
-(use-package geiser-guile)
-
-(use-package typescript-mode
-  :mode "\\.ts\\'"
-  :hook (typescript-mode . lsp-deferred)
-  :config
-  (setq typescript-indent-level 2)
-  (require 'dap-node))
-
-(use-package nix-mode
-  :mode "\\.nix\\'")
-
-(use-package haskell-mode
-      :mode "\\.hs\\'"
-)
-
-(use-package rust-mode
-  :mode "\\.rs\\'"
-  :hook (rust-mode . lsp-deferred))
-
-(use-package lua-mode
-  :mode "\\.lua\\'"
-  :hook (lua-mode . lsp-deferred))
-
-(use-package yasnippet
-  :config
-  (setq yas-snippet-dirs '("~/emacs/snippets"))
-  (yas-global-mode 1))
+(keo/leader-keys
+  "e" '(:ignore t :which-key "ERC")
+  "ej" '(lambda () (interactive)
+          (insert "/join #") :which-key "Join")
+  "eq" '(lambda () (interactive)
+          (insert "/quit")
+          (erc-send-current-line) :which-key "Quit")
+  "d"   '(:ignore t :which-key "dired")
+  "dd"  '(dired :which-key "Here")
+  "dh"  '((lambda () (interactive) (dired "~")) :which-key "Home")
+  "dn"  '((lambda () (interactive) (dired "~/Notes")) :which-key "Notes")
+  "do"  '((lambda () (interactive) (dired "~/Downloads")) :which-key "Downloads")
+  "d."  '((lambda () (interactive) (dired "~/.dotfiles")) :which-key "dotfiles")
+  "de"  '((lambda () (interactive) (dired "~/.dotfiles/config/emacs")) :which-key ".emacs.d")
+  "b" '(:ignore t :which-key "Buffer")
+  "bs" '(consult-buffer :which-key "Switch Buffer")
+  "fd" '(:ignore t :which-key "dotfiles")
+  "fde" '((lambda () (interactive) (find-file "~/.dotfiles/config/emacs/Emacs.org")))
+  "p" '(:ignore t :which-key "Pass")
+  "pp" '(password-store-copy :which-key "Copy")
+  "pn" '(password-store-insert :which-key "New")
+  "pg" '(password-store-generate :which-key "Generate"))
 
 (use-package mu4e
   :ensure nil
@@ -458,6 +378,8 @@
   (setq mu4e-update-interval (* 10 60))
   (setq mu4e-get-mail-command "mbsync -a")
   (setq mu4e-maildir "~/Mail")
+  (setq mu4e-completing-read-function #'completing-read)
+  (setq mu4e-change-filenames-when-moving t)
 
   (setq mu4e-contexts
         (list
@@ -466,18 +388,46 @@
           :match-func
           (lambda (msg)
             (when msg
-              (string-prefix-p "/Gmail" (mu4e-message-field msg :maildir))))
-          :vars '((user-mail-address . "teknikgillaren@gmail.com")
+              (string-prefix-p "/" (mu4e-message-field msg :maildir))))
+          :vars '((user-mail-address . "mg433@kimane.se")
                   (user-full-name    . "Karl Elis Odenhage")
-                  (mu4e-drafts-folder  . "/Gmail/Drafts")
-                  (mu4e-sent-folder  . "/Gmail/Sent Mail")
-                  (mu4e-refile-folder  . "/Gmail/All Mail")
-                  (mu4e-trash-folder  . "/Gmail/Trash")
-                  (smtpmail-smtp-server . "smtp.google.com")
+                  (mu4e-drafts-folder  . "/Drafts")
+                  (mu4e-sent-folder  . "/Sent Mail")
+                  (mu4e-refile-folder  . "/All Mail")
+                  (mu4e-trash-folder  . "/Trash")
+                  (smtpmail-smtp-server . "mail.kimane.se")
                   (smtpmail-smtp-service . 465)
                   (smtpmail-stream-type . ssl)))))
 
+  (defun remove-nth-element (nth list)
+    (if (zerop nth) (cdr list)
+      (let ((last (nthcdr (1- nth) list)))
+        (setcdr last (cddr last))
+        list)))
+  (setq mu4e-marks (remove-nth-element 5 mu4e-marks))
+  (add-to-list 'mu4e-marks
+               '(trash
+                 :char ("d" . "▼")
+                 :prompt "dtrash"
+                 :dyn-target (lambda (target msg) (mu4e-get-trash-folder msg))
+                 :action (lambda (docid msg target)
+                           (mu4e~proc-move docid
+                                           (mu4e~mark-check-target target) "-N"))))
+
   (setq message-send-mail-function 'smtpmail-send-it)
+  (setq mu4e-compose-signature "- mg433")
+
+  (setq message-kill-buffer-on-exit t)
+
+  ;; Display options
+  (setq mu4e-view-show-images t)
+  (setq mu4e-view-show-addresses 't)
+
+  ;; Composing mail
+  (setq mu4e-compose-dont-reply-to-self t)
+
+  ;; Use mu4e for sending e-mail
+  (setq mail-user-agent 'mu4e-user-agent)
 
   (setq mu4e-maildir-shortcuts
         '(("/Inbox"     . ?i)
@@ -486,34 +436,59 @@
           ("/Drafts"    . ?d)
           ("/All Mail"  . ?a))))
 
+(setq keo/mu4e-inbox-query
+      "maildir:/Inbox AND flag:unread")
+
+(defun keo/go-to-inbox ()
+  (interactive)
+  (mu4e-headers-search keo/mu4e-inbox-query))
+
+(use-package mu4e-alert
+  :after mu4e
+  :config
+  ;; Show unread emails from all inboxes
+  (setq mu4e-alert-interesting-mail-query keo/mu4e-inbox-query)
+
+  ;; Show notifications for mails already notified
+  (setq mu4e-alert-notify-repeated-mails nil)
+
+  (mu4e-alert-enable-notifications))
 
 (use-package org-mime
   :bind
   ("C-<return>" . org-mime-htmlize))
 
-(use-package mpv)
-
-(use-package playerctl)
-
 (use-package erc
   :ensure nil
-  :config
-
-  )
-
-(use-package mastodon
-  :config
-  (setq mastodon-instance-url "https://emacs.ch"
-        mastodon-active-user "Mastergamer433")
-  (mastodon-discover))
-
-(use-package edit-server
-  :config
-  (setq edit-server-new-frame t)
-  :init
-  (edit-server-start))
+  :config)
 
 (use-package password-store)
+
+(use-package auth-source
+  :config
+  (setq auth-source '(password-store)))
+
+(use-package ement)
+
+(use-package dired
+  :ensure nil
+  :commands (dired dired-jump)
+  :bind (("C-x C-j" . dired-jump))
+  :custom ((dired-listing-switches "-agho --group-directories-first"))
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+    "h" 'dired-single-up-directory
+    "l" 'dired-single-buffer))
+
+(use-package all-the-icons-dired
+  :hook (dired-mode . all-the-icons-dired-mode))
+
+(setq delete-by-moving-to-trash t)
+
+(use-package denote
+  :config
+  (setq denote-directory "~/Notes/")
+  (setq denote-known-keywords '("journal" "projects" "ideas")))
 
 (defun keo/org-font-setup ()
   ;; Replace list hyphen with dot
@@ -600,60 +575,6 @@
 
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'keo/org-babel-tangle-config)))
 
-(use-package org-roam
-  :custom
-  (org-roam-directory "~/Notes")
-  (org-roam-completion-everywhere t)
-  (org-roam-capture-templates
-   '(("d" "default" plain
-      "%?"
-      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-      :unnarrowed t)
-     ("l" "programming language" plain
-      "* Characteristics\n\n- Family: %?\n- Inspired by: \n\n* Reference\n\n"
-      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n\n")
-      :unnarrowed t)
-     ("b" "book notes" plain
-      (file "~/Notes/Templates/BookNoteTemplate.org")
-      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-      :unnarrowed t)
-     ("p" "project" plain "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
-      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: Project")
-      :unnarrowed t)
-     ))
-  (org-roam-dailies-capture-templates
-   '(("d" "default" entry "* %<%H:%M>: %?"
-      :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n\n"))
-     ("t" "Task" entry
-      #'org-roam-capture--get-point
-      "* TODO %?\n  %U\n  %a\n  %i"
-      :file-name "Journal/%<%Y-%m-%d>"
-      :olp ("Tasks")
-      :empty-lines 1
-      :head "#+title: %<%Y-%m-%d %a>\n\n[[roam:%<%Y-%B>]]\n\n")))
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n i" . org-roam-node-insert)
-         :map org-mode-map
-         ("C-M-i" . completion-at-point)
-         :map org-roam-dailies-map
-         ("Y" . org-roam-dailies-capture-yesterday)
-         ("T" . org-roam-dailies-capture-tomorrow))
-  :bind-keymap
-  ("C-c n d" . org-roam-dailies-map)
-  :config
-  (require 'org-roam-dailies) ;; Ensure the keymap is available
-  (org-roam-db-autosync-mode)
-  (org-roam-setup))
-
-(use-package org-tree-slide
-  :after org
-  :config
-  (define-key org-tree-slide-mode-map (kbd "<f5>") 'org-tree-slide-move-previous-tree)
-  (define-key org-tree-slide-mode-map (kbd "<f6>") 'org-tree-slide-move-next-tree))
-(global-set-key (kbd "<f8>") 'org-tree-slide-mode)
-(global-set-key (kbd "S-<f8>") 'org-tree-slide-skip-done-toggle)
-
 (use-package org-caldav
   :init
   (setq org-caldav-url 'google
@@ -661,131 +582,447 @@
         org-caldav-inbox "~/OrgFiles/Calendar.org"
         org-icalendar-timezone "Europe/Stockholm"))
 
-(use-package evil
-  :init
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
-  (setq evil-want-C-u-scroll t)
-  (setq evil-want-C-i-jump nil)
-  :config
-  (evil-mode 1)
-  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+(use-package playerctl
+  :bind(("C-c C-SPC" . playerctl-play-pause-song)
+        ("C-c C-n" . playerctl-next-song)
+        ("C-c C-p" . playerctl-previous-song)
+        ("C-c C-f" . playerctl-seek-forward)
+        ("C-c C-b" . playerctl-seek-backward)))
 
-  ;; Use visual line motions even outside of visual-line-mode buffers
-  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+(use-package request)
 
-  (evil-set-initial-state 'messages-buffer-mode 'normal)
-  (evil-set-initial-state 'dashboard-mode 'normal))
+(use-package s)
 
-(use-package evil-collection
-  :after evil
-  :config
-  (evil-collection-init))
+(use-package ht)
 
-(use-package general
-:config
-(general-create-definer keo/exwm-keyboard
-  :keymaps '(normal insert visual emacs)
-  :prefix "s"
-  :global-prefix "s")
-(general-create-definer keo/leader-keys
-  :keymaps '(normal insert visual emacs)
-  :prefix "SPC"
-  :global-prefix "C-SPC"))
+(use-package ov)
 
-(keo/leader-keys
-"t"  '(:ignore t :which-key "Toggles")
-"tt" '(counsel-load-theme :which-key "Choose Theme")
-"o" '(:ignore t :which-key "Org")
-"oa" '(org-agenda-list :which-key "List Org Agenda")
-"ob" '(:ignore t :which-key "Bable")
-"obt" '(org-babel-tangle :which-key "Tangle")
-"b" '(:ignore t :which-key "Buffer")
-"bs" '(consult-buffer :which-key "Switch Buffer")
-"w" '(:ignore :which-key "EXWM")
-"wr" '(exwm-reset)
-"ww" '(exwm-workspace-switch :which-key "Switch workspace")
-"wh" '(windmove-left :which-key "Focus the window to the left")
-"wj" '(windmove-down :which-key "Focus the window down") 
-"wk" '(windmove-up :which-key "Focus the window up")
-"wl" '(windmove-right :which-key "Focus the window to the right")
-"w&" '(lambda (command)
-        (interactive (list (read-shell-command "$ ")))
-        (start-process-shell-command command nil command))
-"wf" '(exwm-layout-toggle-fullscreen)
-"e" '(:ignore t :which-key "ERC")
-"ej" '(lambda () (interactive)
-        (insert "/join #") :which-key "Join")
-"eq" '(lambda () (interactive)
-        (insert "/quit")
-        (erc-send-current-line) :which-key "Quit")
+(use-package websocket)
 
-"p" '(:ignore t :which-key "pass")
-"pp" '(password-store-copy :which-key "Copy")
-"pn" '(password-store-insert :which-key "New")
-"pg" '(password-store-generate :which-key "Generate")
-"s" '(:ignore t :which-key "Spotify")
-"sP" '(counsel-spotify-toggle-play-pause :which-key "Play/Pause")
-"sn" '(counsel-spotify-next :which-key "Next")
-"sp" '(counsel-spotify-previous :which-key "Previuos")
-"sst" '(counsel-spotify-search-track :which-key "Search Track"))
+(use-package ts)
 
-(use-package emacsql-mysql)
+(use-package f)
 
-(setq emacs-db (emacsql-mysql "harry_potter_emacs" :user "harry_potter_emacs"
-                              :password ""
-                              :host "192.168.21.228"))
-(setq awesomewm-db (emacsql-mysql "harry_potter_awesomewm" :user "harry_potter_awesomewm"
-                                  :password ""
-                                  :host "192.168.21.228"))
+(use-package jeison)
+
+(defun keo/org-file-jump-to-heading (org-file heading-title)
+  (interactive)
+  (find-file (expand-file-name org-file))
+  (goto-char (point-min))
+  (let ((i 1))
+    (mapcar (lambda (heading)
+              (search-forward (concat (s-repeat i "*") " " heading)))
+            (s-split "/" heading-title)))
+  (org-overview)
+  (org-reveal)
+  (org-show-subtree)
+  (forward-line))
+
+
+
+(setq window-rules
+      '(("Emacs Dired" . (("instance" . "Emacs-Dired")
+                          ("class" . "Emacs")
+                          ("floating" . "true")))
+        ("Discord" . (("class" . "discord")
+                      ("tag" . "chat")))
+        ("firefox" . (("class" . "firefox")
+                      ("tag" . "www")))))
+
+(defun keo/wm-window-rules ()
+  (s-join
+   "\n"
+   (mapcar
+    (lambda (rule)
+      (format
+       "herbstclient rule %s"
+       (s-join
+        " "
+        (mapcar
+         (lambda (arg)
+           (format
+            "%s=%s"
+            (car arg)
+            (cdr arg)))
+         (cdr rule)))))
+    window-rules)))
+(keo/wm-window-rules)
+
+(defun keo/wm-open-heading-emacs-config ()
+  (find-file
+   "~/.dotfiles/config/emacs/Emacs.org")
+  (goto-char 1)
+  (let* ((headings (list)))
+    (org-map-entries
+     (lambda ()
+       (let ((elem (org-element-at-point)))
+         (add-to-list
+          'headings
+          `(,(s-concat (s-repeat (1- (org-element-property :level elem)) "  ") (org-element-property
+                                                                           :title elem)) . ,(org-format-outline-path
+                                                                                             (org-get-outline-path t)))))))
+    (let ((heading (keo/wm-ask (reverse (mapcar 'car headings)) "Heading" t)))
+      (keo/org-file-jump-to-heading
+      "~/.dotfiles/config/emacs/Emacs.org"
+       (cdr (assoc heading headings))))))
+
+(defun keo/wm-goto-workspace (workspace)
+  (shell-command-to-string (format "herbstclient use %s" workspace)))
+
+(defun keo/wm-search-youtube ()
+  (let ((search (keo/wm-ask '() "Search")))
+    (browse-url (s-trim (format "https://www.youtube.com/results?search_query=%s" (string-replace " " "+" search))))
+    (keo/wm-goto-workspace "www")))
+
+(defun keo/wm-search-google ()
+  (let ((search (keo/wm-ask '() "Search")))
+    (browse-url (s-trim (format "https://www.google.com/search?q=%s" (string-replace " " "+" search))))
+    (keo/wm-goto-workspace "www")))
+
+(defun keo/wm-open-github-repo (&optional prompt-for-everything)
+  (interactive)
+  (let* ((owner (keo/wm-ask '() (if prompt-for-everything "Repo Owner" "Repo")))
+         (user (when prompt-for-everything (keo/wm-ask '() "Repo Name")))
+         (path (mapconcat 'identity `(,owner ,user) "/")))
+    (browse-url (format "https://github.com/%s" path))
+    (keo/wm-goto-window-by-class "Firefox")))
+
+(defun keo/wm-get-all-clients ()
+  (string-split
+   (s-trim
+    (shell-command-to-string "herbstclient attr clients | grep 0x"))))
+
+(defun keo/wm-get-title-of-client (client)
+  (s-trim
+   (shell-command-to-string (format "herbstclient attr clients.%s | grep title | cut -d'\"' -f2" client))))
+
+(defun keo/wm-get-class-of-client (client)
+  (s-trim
+   (shell-command-to-string (format "herbstclient attr clients.%s | grep class | cut -d'\"' -f2" client))))
+
+(defun keo/wm-get-title-of-all-clients ()
+  (let ((titles (list))
+        (clients (keo/wm-get-all-clients)))
+    (mapcar 
+     (lambda (c)
+       (push (s-trim (keo/wm-get-title-of-client c)) titles))
+     clients)
+    titles))
+
+(defun keo/wm-get-client-by-name (name)
+  (let ((client "")
+        (clients (keo/wm-get-all-clients)))
+    (mapcar 
+     (lambda (c)
+       (if (equal name (keo/wm-get-title-of-client c))
+           (setq client c)))
+     clients)
+    client))
+
+(defun keo/wm-get-client-by-class (class)
+  (let ((client "")
+        (clients (keo/wm-get-all-clients)))
+    (mapcar 
+     (lambda (c)
+       (if (equal class (keo/wm-get-class-of-client c))
+           (setq client c)))
+     clients)
+    client))
+
+(defun keo/wm-get-client-class-by-name (name)
+  (let ((client (keo/wm-get-client-by-name name)))
+    (s-trim (shell-command-to-string (format "herbstclient attr clients.%s | grep class | cut -d'\"' -f2" client)))))
+
+(defun keo/wm-goto-window-by-class (class)
+  (let* ((client (keo/wm-get-client-by-class class)))
+    (if client
+        (shell-command-to-string (format "herbstclient jumpto %s" (s-left (- (length client) 1) client))))))
+
+(defun keo/wm-switch-window ()
+  (let* ((names (keo/wm-get-title-of-all-clients))
+         (choices (list))
+         (format-choice-function (lambda (name)
+                           (push
+                            (format
+                             "%s: %s"
+                             (keo/wm-get-client-class-by-name
+                              name)
+                             name)
+                            choices)))
+         (client (keo/wm-get-client-by-name
+                  (s-trim-left
+                   (cadr
+                    (s-split
+                     ":"
+                     (s-chomp
+                      (keo/wm-ask
+                       (let ((choices (list)))
+                         (mapcar format-choice-function names)
+                         choices)
+                       "Window"))))))))
+    (shell-command-to-string
+     (format
+      "herbstclient jumpto %s"
+      (s-left
+       (- (length client) 1)
+       client)))))
+
+(defun keo/wm-ask (choices &optional prompt trim-newline)
+  (let ((choice (shell-command-to-string
+                 (format
+                  "echo \"%s\" | rofi -dmenu -p \"%s\""
+                  (string-join choices "\n")
+                  prompt))))
+    (if trim-newline
+        (s-trim-right choice)
+      choice)))
+
+(setq keo/configs `(("emacs" . ("~/.dotfiles/config/emacs/Emacs.org"))
+                    ("herbstluft" . ("~/.dotfiles/config/herbstluftwm/autostart"))
+                    ("fish" . (,(format "~/.dotfiles/hosts/%s/default.nix" (system-name)) ,9))))
+
+(defun keo/wm-open-config (config)
+  (select-frame
+   (make-frame
+    '((name . "Emacs-Config"))))
+  (find-file
+   (cadr (assoc config keo/configs)))
+  (let ((line (caddr
+                (assoc config keo/configs)))
+        (regex (cadddr
+                 (assoc config keo/configs))))
+    (if line (goto-line line))
+    (if regex
+        (progn
+          (beginning-of-buffer)
+          (search-forward-regexp regex))))
+  (delete-other-windows))
+
+(setq keo/dirs `(("home" . "~/")
+                 ("dotfiles" . "~/.dotfiles/")
+                 ("downloads" . "~/Downloads/")
+                 ("projects" . "~/Projects/")))
+
+(defun keo/wm-open-dired (dir)
+  (select-frame
+   (make-frame
+    '((name . "Emacs-Dired"))))
+  (dired
+   (cdr (assoc dir keo/dirs)))
+  (delete-other-windows))
+
+(defun keo/wm-open-project ()
+  (select-frame
+   (make-frame
+    '((name . "Project"))))
+  (projectile-switch-project-by-name
+   (keo/wm-ask projectile-known-projects "Project"))
+  (delete-other-windows))
+
+(defun keo/wm-denote-new-note ()
+  (select-frame (make-frame '((name . "New-Note"))))
+  (call-interactively 'denote-subdirectory)
+  (delete-other-windows))
+
+(defun keo/wm-wallpaper ()
+  window-manager-wallpaper-path)
+
+(defun keo/mail-count (max-count)
+  (if keo/mu4e-inbox-query
+    (let* ((mail-count (shell-command-to-string
+                         (format "mu find --nocolor -n %s \"%s\" | wc -l" max-count keo/mu4e-inbox-query))))
+      (format " %s" (string-trim mail-count)))
+    ""))
 
 (defun keo/org-agenda ()
   (select-frame (make-frame '((name . "Calendar"))))
   (org-agenda-list)
   (delete-other-windows))
 
-;;(emacsql awesomewm-db [:create-table clients
-;;           ([(id integer :primary-key) name class])])
+(defun keo/new-config-frame ()
+  (select-frame (make-frame '((name . "Config"))))
+  (persp-switch "Config")
+  (find-file "~/.dotfiles/config/emacs/Emacs.org")
+  (split-window)
+  (find-file "~/.dotfiles/config/herbstluftwm/autostart"))
 
-(cl-defun keo/awesomewm-new-client (&key id name class)
-  (emacsql awesomewm-db [:insert :into clients 
-                                 :values ([$s1 $s2 $s3])]
-           id name class))
-(cl-defun keo/awesomewm-remove-client (&key id)
-  (emacsql awesomewm-db [:delete :from clients
-                                 :where (= id $s1)]
-           id))
-(cl-defun keo/awesomewm-rename-client (&key id name class)
-  (emacsql awesomewm-db [:delete :from clients
-                                 :where (= id $s1)]
-           id)
-  (emacsql awesomewm-db [:insert :into clients 
-                                 :values ([$s1 $s2])]
-           id name class))
+(use-package edwina
+  :config
+  (setq display-buffer-base-action '(display-buffer-below-selected))
+  (edwina-setup-dwm-keys)
+  (edwina-mode 1))
 
-(defun keo/awesomemwm-wallpaper ()
-  window-manager-wallpaper-path)
+(use-package ace-window
+  :bind (("M-o" . ace-window))
+  :custom
+  (aw-scope 'frame)
+  (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+  (aw-minibuffer-flag t)
+  :config
+  (ace-window-display-mode 1))
 
-(cl-defun awesomewm-notify (&key title text)
-  (start-process-shell-command "awesome-client" nil (format "
-awesome-client '
-awful = require(\"awful\")
-function ()
-   local screen = awful.screen
-   local tag = screen.tags[6]
-   if tag then
-      tag:view_only()
-   end
-end,
-'" title text)))
+(use-package winner
+  :ensure nil
+  :after evil
+  :config
+  (winner-mode)
+  (define-key evil-window-map "u" 'winner-undo)
+  (define-key evil-window-map "U" 'winner-redo))
 
-(cl-defun awesomewm-notify (&key title text)
-  (start-process-shell-command "awesome-client" nil (format "
-awesome-client '
-naughty = require(\"naughty\")
-naughty.notify({
-title=\"%s\",
-text=\"%s\"})
-'" title text)))
+(setq backup-directory-alist `(("." . ,(expand-file-name "tmp/backups/" user-emacs-directory))))
+
+
+;; auto-save-mode doesn't create the path automatically!
+(make-directory (expand-file-name "tmp/auto-saves/" user-emacs-directory) t)
+
+(setq auto-save-list-file-prefix (expand-file-name "tmp/auto-saves/sessions/" user-emacs-directory)
+      auto-save-file-name-transforms `((".*" ,(expand-file-name "tmp/auto-saves/" user-emacs-directory) t)))
+
+(setq create-lockfiles nil)
+
+(setq projectile-known-projects-file (expand-file-name "tmp/projectile-bookmarks.eld" user-emacs-directory)
+      lsp-session-file (expand-file-name "tmp/.lsp-session-v1" user-emacs-directory))
+
+(use-package no-littering)
+
+(use-package magit
+  :bind ("C-M-;" . magit-status)
+  :commands (magit-status magit-get-current-branch)
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+(use-package magit-todos)
+
+(defun dw/switch-project-action ()
+  "Switch to a workspace with the project name and start `magit-status'."
+  ;; TODO: Switch to EXWM workspace 1?
+  (persp-switch (projectile-project-name))
+  (magit-status))
+
+(use-package projectile
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :demand t
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+  :init
+  (when (file-directory-p "~/Projects")
+    (setq projectile-project-search-path '("~/Projects")))
+  (setq projectile-switch-project-action #'dw/switch-project-action))
+
+(use-package counsel-projectile
+  :after projectile
+  :bind (("C-M-p" . counsel-projectile-find-file))
+  :config
+  (counsel-projectile-mode))
+
+(use-package eglot
+  :bind (:map eglot-mode-map
+              ("C-c C-a" . eglot-code-actions)
+              ("C-c C-r" . eglot-rename))
+  :config
+  (setq eglot-autoshutdown t
+        eglot-confirm-server-initiated-edits nil)
+  (add-to-list 'eglot-server-programs
+               '((js2-mode typescript-mode) . ("typescript-language-server" "--stdio"))))
+
+(use-package dap-mode)
+
+(use-package lispy
+  :hook ((emacs-lisp-mode . lispy-mode)
+         (scheme-mode . lispy-mode)))
+
+(use-package lispyville
+  :hook ((lispy-mode . lispyville-mode))
+  :config
+  (lispyville-set-key-theme '(operators c-w additional
+                                        additional-movement slurp/barf-cp
+                                        prettify)))
+
+(use-package helpful
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . helpful-function)
+  ([remap describe-symbol] . helpful-symbol)
+  ([remap describe-variable] . helpful-variable)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-key] . helpful-key))
+
+(use-package highlight-defined
+  :hook (emacs-lisp-mode . highlight-defined-mode))
+
+(use-package elmacro
+  :hook (emacs-lisp-mode . elmacro-mode))
+
+(use-package easy-escape
+  :hook ((emacs-lisp-mode . easy-escape-minor-mode)
+         (lisp-mode       . easy-escape-minor-mode)))
+
+(use-package slime
+  :config
+  (setq inferior-lisp-program "sbcl"))
+
+(use-package geiser)
+(use-package geiser-guile)
+
+(use-package typescript-mode
+  :mode "\\.ts\\'"
+  :hook (typescript-mode . lsp-deferred)
+  :config
+  (setq typescript-indent-level 2)
+  (require 'dap-node))
+
+(use-package nix-mode
+  :mode "\\.nix\\'")
+
+(use-package rust-mode
+  :mode "\\.rs\\'"
+  :hook (rust-mode . lsp-deferred))
+
+(use-package lua-mode
+  :mode "\\.lua\\'"
+  :hook (lua-mode . lsp-deferred))
+
+(use-package fennel-mode
+  :mode "\\.fnl\\'")
+
+(use-package yasnippet
+  :config
+  (setq yas-snippet-dirs '("~/emacs/snippets"))
+  (yas-global-mode 0))
+
+(use-package tempel
+  ;; Require trigger prefix before template name when completing.
+  ;; :custom
+  ;; (tempel-trigger-prefix "<")
+
+  :bind (("M-+" . tempel-expand) ;; Alternative tempel-expand
+         ("M-*" . tempel-insert))
+
+  :init
+
+  ;; Setup completion at point
+  (defun tempel-setup-capf ()
+    ;; Add the Tempel Capf to `completion-at-point-functions'.
+    ;; `tempel-expand' only triggers on exact matches. Alternatively use
+    ;; `tempel-complete' if you want to see all matches, but then you
+    ;; should also configure `tempel-trigger-prefix', such that Tempel
+    ;; does not trigger too often when you don't expect it. NOTE: We add
+    ;; `tempel-expand' *before* the main programming mode Capf, such
+    ;; that it will be tried first.
+    (setq-local completion-at-point-functions
+                (cons #'tempel-expand
+                      completion-at-point-functions)))
+
+  (add-hook 'prog-mode-hook 'tempel-setup-capf)
+  (add-hook 'text-mode-hook 'tempel-setup-capf)
+  (add-hook 'emacs-lisp-mode-hook 'tempel-setup-capf)
+
+  ;; Optionally make the Tempel templates available to Abbrev,
+  ;; either locally or globally. `expand-abbrev' is bound to C-x '.
+  (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+  (global-tempel-abbrev-mode)
+)
+(use-package tempel-collection)

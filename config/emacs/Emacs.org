@@ -387,362 +387,80 @@ display-time-world command provides a nice display of the time at a specified li
     (marginalia-mode))
 #+end_src
 
-** Completion Actions with Embark
+* Keyboard keybinds
+** Which key
 #+begin_src emacs-lisp
-  (defun sudo-find-file (file)
-    "Open FILE as root."
-    (interactive "FOpen file as root: ")
-    (when (file-writable-p file)
-      (user-error "File is user writeable, aborting sudo"))
-    (find-file (if (file-remote-p file)
-                   (concat "/" (file-remote-p file 'method) ":"
-                           (file-remote-p file 'user) "@" (file-remote-p file 'host)
-                           "|sudo:root@"
-                           (file-remote-p file 'host) ":" (file-remote-p file 'localname))
-                 (concat "/sudo:root@localhost:" file))))
+  (use-package which-key
+    :init (which-key-mode)
+    :diminish which-key-mode
+    :config
+    (setq which-key-idle-delay 0))
+#+end_src
 
-  (defun with-minibuffer-keymap (keymap)
-    (lambda (fn &rest args)
-      (minibuffer-with-setup-hook
-          (lambda ()
-            (use-local-map
-             (make-composed-keymap keymap (current-local-map))))
-        (apply fn args))))
-
-  (defvar embark-completing-read-prompter-map
-    (let ((map (make-sparse-keymap)))
-      (define-key map (kbd "<tab>") 'abort-recursive-edit)
-      map))
-
-  (advice-add 'embark-completing-read-prompter :around
-              (with-minibuffer-keymap embark-completing-read-prompter-map))
-  ;;(define-key vertico-map (kbd "<tab>") 'embark-act-with-completing-read)
-
-  (defun embark-act-with-completing-read (&optional arg)
-    (interactive "P")
-    (let* ((embark-prompter 'embark-completing-read-prompter)
-           (act (propertize "Act" 'face 'highlight))
-           (embark-indicator (lambda (_keymap targets) nil)))
-      (embark-act arg)))
-
-  (eval-when-compile
-    (defmacro my/embark-ace-action (fn)
-      `(defun ,(intern (concat "my/embark-ace-" (symbol-name fn))) ()
-         (interactive)
-         (with-demoted-errors "%s"
-           (require 'ace-window)
-           (let ((aw-dispatch-always t))
-             (aw-switch-to-window (aw-select nil))
-             (call-interactively (symbol-function ',fn)))))))
-
-  (eval-when-compile
-    (defmacro my/embark-split-action (fn split-type)
-      `(defun ,(intern (concat "my/embark-"
-                               (symbol-name fn)
-                               "-"
-                               (car (last  (split-string
-                                            (symbol-name split-type) "-"))))) ()
-         (interactive)
-         (funcall #',split-type)
-         (call-interactively #',fn))))
-
-
-  (use-package embark
-    :bind
-    (("C-." . embark-act)         ;; pick some comfortable binding
-     ("C-;" . embark-dwim)        ;; good alternative: M-.
-     ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
-   
+** Evil
+#+begin_src emacs-lisp
+  (use-package evil
     :init
-    ;; Optionally replace the key help with a completing-read interface
-    (setq prefix-help-command #'embark-prefix-help-command)
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    (setq evil-want-C-u-scroll t)
+    (setq evil-want-C-i-jump nil)
     :config
-    ;; Hide the mode line of the Embark live/completions buffers
-    (add-to-list 'display-buffer-alist
-                 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                   nil
-                   (window-parameters (mode-line-format . none)))))
+    (evil-mode 1)
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
 
-  ;; Consult users will also want the embark-consult package.
-  (use-package embark-consult
-    :hook
-    (embark-collect-mode . consult-preview-at-point-mode))
+    ;; Use visual line motions even outside of visual-line-mode buffers
+    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
 
-  (define-key embark-file-map     (kbd "o") (my/embark-ace-action find-file))
-  (define-key embark-buffer-map   (kbd "o") (my/embark-ace-action switch-to-buffer))
-  (define-key embark-bookmark-map (kbd "o") (my/embark-ace-action bookmark-jump))
+    (evil-set-initial-state 'messages-buffer-mode 'normal)
+    (evil-set-initial-state 'dashboard-mode 'normal))
 
-  (define-key embark-file-map     (kbd "2") (my/embark-split-action find-file split-window-below))
-  (define-key embark-buffer-map   (kbd "2") (my/embark-split-action switch-to-buffer split-window-below))
-  (define-key embark-bookmark-map (kbd "2") (my/embark-split-action bookmark-jump split-window-below))
-
-  (define-key embark-file-map     (kbd "3") (my/embark-split-action find-file split-window-right))
-  (define-key embark-buffer-map   (kbd "3") (my/embark-split-action switch-to-buffer split-window-right))
-  (define-key embark-bookmark-map (kbd "3") (my/embark-split-action bookmark-jump split-window-right))
-  (define-key embark-file-map     (kbd "S") 'sudo-find-file)
-#+end_src
-
-* Window Management
-** Dynamic Window Management with edwina
-#+begin_src emacs-lisp
-  (use-package edwina
-    :config
-    (setq display-buffer-base-action '(display-buffer-below-selected))
-    (edwina-setup-dwm-keys)
-    (edwina-mode 1))
-#+end_src
-
-** Window Selection with ace-window
-#+begin_src emacs-lisp
-  (use-package ace-window
-    :bind (("M-o" . ace-window))
-    :custom
-    (aw-scope 'frame)
-    (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-    (aw-minibuffer-flag t)
-    :config
-    (ace-window-display-mode 1))
-#+end_src
-
-** Window History with winner-mode
-#+begin_src emacs-lisp
-  (use-package winner
-    :ensure nil
+  (use-package evil-collection
     :after evil
     :config
-    (winner-mode)
-    (define-key evil-window-map "u" 'winner-undo)
-    (define-key evil-window-map "U" 'winner-redo))
+    (evil-collection-init))
 #+end_src
 
-* Variables
-** WM
+** General
 #+begin_src emacs-lisp
-  (setq window-manager-wallpaper-path "~/.wallpapers/nixos.png")
-#+end_src
-
-* Keep Folders Clean
-#+begin_src emacs-lisp
-  (setq backup-directory-alist `(("." . ,(expand-file-name "tmp/backups/" user-emacs-directory))))
-
-
-  ;; auto-save-mode doesn't create the path automatically!
-  (make-directory (expand-file-name "tmp/auto-saves/" user-emacs-directory) t)
-
-  (setq auto-save-list-file-prefix (expand-file-name "tmp/auto-saves/sessions/" user-emacs-directory)
-        auto-save-file-name-transforms `((".*" ,(expand-file-name "tmp/auto-saves/" user-emacs-directory) t)))
-
-  (setq create-lockfiles nil)
-
-  (setq projectile-known-projects-file (expand-file-name "tmp/projectile-bookmarks.eld" user-emacs-directory)
-        lsp-session-file (expand-file-name "tmp/.lsp-session-v1" user-emacs-directory))
-
-  (use-package no-littering)
-#+end_src
-
-* Development
-** Git
-Magit
-#+begin_src emacs-lisp
-  (use-package magit
-    :bind ("C-M-;" . magit-status)
-    :commands (magit-status magit-get-current-branch)
-    :custom
-    (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-#+end_src
-
-Magit todos
-#+begin_src emacs-lisp
-  (use-package magit-todos)
-#+end_src
-
-Projectile
-#+begin_src emacs-lisp
-  (defun dw/switch-project-action ()
-    "Switch to a workspace with the project name and start `magit-status'."
-    ;; TODO: Switch to EXWM workspace 1?
-    (persp-switch (projectile-project-name))
-    (magit-status))
-
-  (use-package projectile
-    :diminish projectile-mode
-    :config (projectile-mode)
-    :demand t
-    :bind-keymap
-    ("C-c p" . projectile-command-map)
-    :init
-    (when (file-directory-p "~/Projects")
-      (setq projectile-project-search-path '("~/Projects")))
-    (setq projectile-switch-project-action #'dw/switch-project-action))
-
-  (use-package counsel-projectile
-    :after projectile
-    :bind (("C-M-p" . counsel-projectile-find-file))
+    (use-package general
     :config
-    (counsel-projectile-mode))
+    (general-create-definer keo/exwm-keyboard
+      :keymaps '(normal insert visual emacs)
+      :prefix "s"
+      :global-prefix "s")
+    (general-create-definer keo/leader-keys
+      :keymaps '(normal insert visual emacs)
+      :prefix "SPC"
+      :global-prefix "C-SPC"))
 #+end_src
 
-** Languages
-*** Language server support with eglot
+** General leader key
 #+begin_src emacs-lisp
-  (use-package eglot
-    :bind (:map eglot-mode-map
-                ("C-c C-a" . eglot-code-actions)
-                ("C-c C-r" . eglot-rename))
-    :config
-    (setq eglot-autoshutdown t
-          eglot-confirm-server-initiated-edits nil)
-    (add-to-list 'eglot-server-programs
-                 '((js2-mode typescript-mode) . ("typescript-language-server" "--stdio"))))
-#+end_src
-
-*** Debug Adapter Support
-#+begin_src emacs-lisp
-  (use-package dap-mode)
-#+end_src
-
-*** Meta Lisp
-#+begin_src emacs-lisp
-  (use-package lispy
-    :hook ((emacs-lisp-mode . lispy-mode)
-           (scheme-mode . lispy-mode)))
-
-  (use-package lispyville
-    :hook ((lispy-mode . lispyville-mode))
-    :config
-    (lispyville-set-key-theme '(operators c-w additional
-                                          additional-movement slurp/barf-cp
-                                          prettify)))
-#+end_src
-
-*** Emacs Lisp
-#+begin_src emacs-lisp
-  (use-package helpful
-    :custom
-    (counsel-describe-function-function #'helpful-callable)
-    (counsel-describe-variable-function #'helpful-variable)
-    :bind
-    ([remap describe-function] . helpful-function)
-    ([remap describe-symbol] . helpful-symbol)
-    ([remap describe-variable] . helpful-variable)
-    ([remap describe-command] . helpful-command)
-    ([remap describe-key] . helpful-key))
-
-  (use-package highlight-defined
-    :hook (emacs-lisp-mode . highlight-defined-mode))
-
-  (use-package elmacro
-    :hook (emacs-lisp-mode . elmacro-mode))
-
-  (use-package suggest
-    :hook (emacs-lisp-mode . suggest-mode))
-
-  (use-package easy-escape
-    :hooks ((emacs-lisp-mode . easy-escape-minor-mode)
-            (lisp-mode       . easy-escape-minor-mode)))
-#+end_src
-
-*** Common Lisp
-#+begin_src emacs-lisp
-  (use-package slime
-    :config
-    (setq inferior-lisp-program "sbcl"))
-#+end_src
-
-*** Scheme
-#+begin_src emacs-lisp
-  (use-package geiser)
-  (use-package geiser-guile)
-#+end_src
-
-*** TypeScript
-#+begin_src emacs-lisp
-  (use-package typescript-mode
-    :mode "\\.ts\\'"
-    :hook (typescript-mode . lsp-deferred)
-    :config
-    (setq typescript-indent-level 2)
-    (require 'dap-node))
-#+end_src
-
-*** Nix
-#+begin_src emacs-lisp
-  (use-package nix-mode
-    :mode "\\.nix\\'")
-#+end_src
-
-*** Haskell
-#+begin_src emacs-lisp
-    (use-package haskell-mode
-      :mode "\\.hs\\'"
-)
-#+end_src
-
-*** Rust
-#+begin_src emacs-lisp
-  (use-package rust-mode
-    :mode "\\.rs\\'"
-    :hook (rust-mode . lsp-deferred))
-#+end_src
-
-*** Lua
-#+begin_src emacs-lisp
-  (use-package lua-mode
-    :mode "\\.lua\\'"
-    :hook (lua-mode . lsp-deferred))
-#+end_src
-
-*** Fennel
-#+begin_src emacs-lisp
-  (use-package fennel-mode
-    :mode "\\.fnl\\'")
-#+end_src
-** Snippets with yasnippet
-#+begin_src emacs-lisp
-  (use-package yasnippet
-    :config
-    (setq yas-snippet-dirs '("~/emacs/snippets"))
-    (yas-global-mode 0))
-
-  (use-package tempel
-    ;; Require trigger prefix before template name when completing.
-    ;; :custom
-    ;; (tempel-trigger-prefix "<")
-
-    :bind (("M-+" . tempel-expand) ;; Alternative tempel-expand
-           ("M-*" . tempel-insert))
-
-    :init
-
-    ;; Setup completion at point
-    (defun tempel-setup-capf ()
-      ;; Add the Tempel Capf to `completion-at-point-functions'.
-      ;; `tempel-expand' only triggers on exact matches. Alternatively use
-      ;; `tempel-complete' if you want to see all matches, but then you
-      ;; should also configure `tempel-trigger-prefix', such that Tempel
-      ;; does not trigger too often when you don't expect it. NOTE: We add
-      ;; `tempel-expand' *before* the main programming mode Capf, such
-      ;; that it will be tried first.
-      (setq-local completion-at-point-functions
-                  (cons #'tempel-expand
-                        completion-at-point-functions)))
-
-    (add-hook 'prog-mode-hook 'tempel-setup-capf)
-    (add-hook 'text-mode-hook 'tempel-setup-capf)
-    (add-hook 'emacs-lisp-mode-hook 'tempel-setup-capf)
-
-    ;; Optionally make the Tempel templates available to Abbrev,
-    ;; either locally or globally. `expand-abbrev' is bound to C-x '.
-    (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
-    (global-tempel-abbrev-mode)
-  )
-  (use-package tempel-collection)
-
-#+end_src
-
-** Simple HTTPD
-#+begin_src emacs-lisp
-  (use-package simple-httpd)
+  (keo/leader-keys
+    "e" '(:ignore t :which-key "ERC")
+    "ej" '(lambda () (interactive)
+            (insert "/join #") :which-key "Join")
+    "eq" '(lambda () (interactive)
+            (insert "/quit")
+            (erc-send-current-line) :which-key "Quit")
+    "d"   '(:ignore t :which-key "dired")
+    "dd"  '(dired :which-key "Here")
+    "dh"  '((lambda () (interactive) (dired "~")) :which-key "Home")
+    "dn"  '((lambda () (interactive) (dired "~/Notes")) :which-key "Notes")
+    "do"  '((lambda () (interactive) (dired "~/Downloads")) :which-key "Downloads")
+    "d."  '((lambda () (interactive) (dired "~/.dotfiles")) :which-key "dotfiles")
+    "de"  '((lambda () (interactive) (dired "~/.dotfiles/config/emacs")) :which-key ".emacs.d")
+    "b" '(:ignore t :which-key "Buffer")
+    "bs" '(consult-buffer :which-key "Switch Buffer")
+    "fd" '(:ignore t :which-key "dotfiles")
+    "fde" '((lambda () (interactive) (find-file "~/.dotfiles/config/emacs/Emacs.org")))
+    "p" '(:ignore t :which-key "Pass")
+    "pp" '(password-store-copy :which-key "Copy")
+    "pn" '(password-store-insert :which-key "New")
+    "pg" '(password-store-generate :which-key "Generate"))
 #+end_src
 
 * Applications
@@ -822,13 +540,13 @@ Projectile
 
   (defun keo/go-to-inbox ()
     (interactive)
-    (mu4e-headers-search dw/mu4e-inbox-query))
+    (mu4e-headers-search keo/mu4e-inbox-query))
 
   (use-package mu4e-alert
     :after mu4e
     :config
     ;; Show unread emails from all inboxes
-    (setq mu4e-alert-interesting-mail-query dw/mu4e-inbox-query)
+    (setq mu4e-alert-interesting-mail-query keo/mu4e-inbox-query)
 
     ;; Show notifications for mails already notified
     (setq mu4e-alert-notify-repeated-mails nil)
@@ -840,16 +558,6 @@ Projectile
     ("C-<return>" . org-mime-htmlize))
 #+end_src
 
-** Media
-*** mpv
-#+begin_src emacs-lisp
-  (use-package mpv)
-#+end_src
-*** Controlling
-#+begin_src emacs-lisp
-  (use-package playerctl)
-#+end_src
-
 ** Chatting
 *** ERC
 I like IRC so I wanna use ERC an IRC client for Emacs.
@@ -858,31 +566,6 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
     :ensure nil
     :config)
 
-  (keo/leader-keys
-    "e" '(:ignore t :which-key "ERC")
-    "ej" '(lambda () (interactive)
-            (insert "/join #") :which-key "Join")
-    "eq" '(lambda () (interactive)
-            (insert "/quit")
-            (erc-send-current-line) :which-key "Quit"))
-#+end_src
-
-** Mastodon
-#+begin_src emacs-lisp
-  (use-package mastodon
-    :config
-    (setq mastodon-instance-url "https://emacs.ch"
-          mastodon-active-user "Mastergamer433")
-    (mastodon-discover))
-#+end_src
-
-** Firefox
-#+begin_src emacs-lisp
-  (use-package edit-server
-    :config
-    (setq edit-server-new-frame t)
-    :init
-    (edit-server-start))
 #+end_src
 
 ** Password Manager
@@ -892,11 +575,6 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
   (use-package auth-source
     :config
     (setq auth-source '(password-store)))
-#+end_src
-
-** Gemini
-#+begin_src emacs-lisp
-  (use-package elpher)
 #+end_src
 
 ** Matrix
@@ -917,19 +595,6 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
       "h" 'dired-single-up-directory
       "l" 'dired-single-buffer))
 
-  (keo/leader-keys
-    "d"   '(:ignore t :which-key "dired")
-    "dd"  '(dired :which-key "Here")
-    "dh"  '((lambda () (interactive) (dired "~")) :which-key "Home")
-    "dn"  '((lambda () (interactive) (dired "~/Notes")) :which-key "Notes")
-    "do"  '((lambda () (interactive) (dired "~/Downloads")) :which-key "Downloads")
-    "d."  '((lambda () (interactive) (dired "~/.dotfiles")) :which-key "dotfiles")
-    "de"  '((lambda () (interactive) (dired "~/.dotfiles/config/emacs")) :which-key ".emacs.d"))
-#+end_src
-
-** Dired Single
-#+begin_src emacs-lisp
-  (use-package dired-single)
 #+end_src
 
 ** Dired Icons
@@ -1026,13 +691,6 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 
 #+end_src
 
-*Guix Packages*
-#+begin_src scheme :noweb-ref packages :noweb-sep "\n"
-  "emacs-org"
-  "emacs-org-bullets"
-  "emacs-visual-fill-column"
-#+end_src
-
 ** Configure Babel Languages
 
 #+begin_src emacs-lisp
@@ -1059,76 +717,6 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 
 #+end_src
 
-** Org Roam
-#+begin_src emacs-lisp
-  (use-package org-roam
-    :custom
-    (org-roam-directory "~/Notes")
-    (org-roam-completion-everywhere t)
-    (org-roam-capture-templates
-     '(("d" "default" plain
-        "%?"
-        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-        :unnarrowed t)
-       ("l" "programming language" plain
-        "* Characteristics\n\n- Family: %?\n- Inspired by: \n\n* Reference\n\n"
-        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n\n")
-        :unnarrowed t)
-       ("b" "book notes" plain
-        (file "~/Notes/Templates/BookNoteTemplate.org")
-        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-        :unnarrowed t)
-       ("p" "project" plain "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
-        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: Project")
-        :unnarrowed t)
-       ))
-    (org-roam-dailies-capture-templates
-     '(("d" "default" entry "* %<%H:%M>: %?"
-        :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n\n"))
-       ("t" "Task" entry
-        #'org-roam-capture--get-point
-        "* TODO %?\n  %U\n  %a\n  %i"
-        :file-name "Journal/%<%Y-%m-%d>"
-        :olp ("Tasks")
-        :empty-lines 1
-        :head "#+title: %<%Y-%m-%d %a>\n\n[[roam:%<%Y-%B>]]\n\n")))
-    :bind (("C-c n l" . org-roam-buffer-toggle)
-           ("C-c n f" . org-roam-node-find)
-           ("C-c n i" . org-roam-node-insert)
-           :map org-mode-map
-           ("C-M-i" . completion-at-point)
-           :map org-roam-dailies-map
-           ("Y" . org-roam-dailies-capture-yesterday)
-           ("T" . org-roam-dailies-capture-tomorrow))
-    :bind-keymap
-    ("C-c n d" . org-roam-dailies-map)
-    :config
-    (require 'org-roam-dailies) ;; Ensure the keymap is available
-    (org-roam-db-autosync-mode)
-    (org-roam-setup))
-#+end_src
-
-*Guix Packages*
-#+begin_src scheme :noweb-ref packages :noweb-sep "\n"
-  "emacs-org-roam"
-#+end_src
-
-** Org Present
-#+begin_src emacs-lisp
-  (use-package org-tree-slide
-    :after org
-    :config
-    (define-key org-tree-slide-mode-map (kbd "<f5>") 'org-tree-slide-move-previous-tree)
-    (define-key org-tree-slide-mode-map (kbd "<f6>") 'org-tree-slide-move-next-tree))
-  (global-set-key (kbd "<f8>") 'org-tree-slide-mode)
-  (global-set-key (kbd "S-<f8>") 'org-tree-slide-skip-done-toggle)
-#+end_src
-
-*Guix Packages*
-#+begin_src scheme :noweb-ref packages :noweb-sep "\n"
-  "emacs-org-tree-slide"
-#+end_src
-
 ** Org CalDav
 #+begin_src emacs-lisp
       (use-package org-caldav
@@ -1139,80 +727,7 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
               org-icalendar-timezone "Europe/Stockholm"))
 #+end_src
 
-* Keyboard keybinds
-** Which key
-#+begin_src emacs-lisp
-  (use-package which-key
-    :init (which-key-mode)
-    :diminish which-key-mode
-    :config
-    (setq which-key-idle-delay 0))
-#+end_src
-
-** Hydra
-#+begin_src emacs-lisp
-  (use-package hydra)
-#+end_src
-
-** Evil
-#+begin_src emacs-lisp
-  (use-package evil
-    :init
-    (setq evil-want-integration t)
-    (setq evil-want-keybinding nil)
-    (setq evil-want-C-u-scroll t)
-    (setq evil-want-C-i-jump nil)
-    :config
-    (evil-mode 1)
-    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-
-    ;; Use visual line motions even outside of visual-line-mode buffers
-    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-
-    (evil-set-initial-state 'messages-buffer-mode 'normal)
-    (evil-set-initial-state 'dashboard-mode 'normal))
-
-  (use-package evil-collection
-    :after evil
-    :config
-    (evil-collection-init))
-#+end_src
-
-** General
-#+begin_src emacs-lisp
-    (use-package general
-    :config
-    (general-create-definer keo/exwm-keyboard
-      :keymaps '(normal insert visual emacs)
-      :prefix "s"
-      :global-prefix "s")
-    (general-create-definer keo/leader-keys
-      :keymaps '(normal insert visual emacs)
-      :prefix "SPC"
-      :global-prefix "C-SPC"))
-#+end_src
-
-** General leader key
-#+begin_src emacs-lisp
-  (keo/leader-keys
-    "b" '(:ignore t :which-key "Buffer")
-    "bs" '(consult-buffer :which-key "Switch Buffer")
-    "fd" '(:ignore t :which-key "dotfiles")
-    "fde" '((lambda () (interactive) (find-file "~/.dotfiles/config/emacs/Emacs.org")))
-    "p" '(:ignore t :which-key "Pass")
-    "pp" '(password-store-copy :which-key "Copy")
-    "pn" '(password-store-insert :which-key "New")
-    "pg" '(password-store-generate :which-key "Generate"))
-#+end_src
-
 * Libs
-** Mysql
-#+begin_src emacs-lisp
-  (use-package emacsql-mysql)
-#+end_src
-
 ** Playerctl
 #+begin_src emacs-lisp
   (use-package playerctl
@@ -1263,49 +778,7 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
   (use-package jeison)
 #+end_src
 
-* Databases
-#+begin_src emacs-lisp
-  (if (equal (system-name) "harry-potter")
-      (progn
-        (setq emacs-db (emacsql-mysql "harry_potter_emacs" :user "harry_potter_emacs"
-                                      :password ""
-                                      :host "192.168.21.228"))
-        (setq awesomewm-db (emacsql-mysql "harry_potter_awesomewm" :user "harry_potter_awesomewm"
-                                          :password ""
-                                          :host "192.168.21.228"))))
-#+end_src
-
 * My own Emacs functions
-** Find File Mysql
-#+begin_src emacs-lisp
-  (defun uuid-create ()
-    "Return a newly generated UUID. This uses a simple hashing of variable data."
-    (let ((s (md5 (format "%s%s%s%s%s%s%s%s%s%s"
-                          (user-uid)
-                          (emacs-pid)
-                          (system-name)
-                          (user-full-name)
-                          user-mail-address
-                          (current-time)
-                          (emacs-uptime)
-                          (garbage-collect)
-                          (random)
-                          (recent-keys)))))
-      (format "%s-%s-3%s-%s-%s"
-              (substring s 0 8)
-              (substring s 8 12)
-              (substring s 13 16)
-              (substring s 16 20)
-              (substring s 20 32))))
-
-  (defun find-file-mysql ()
-      (emacsql emacs-db [:insert :into files
-                         :values ([$s1 $s2 $s3])]
-              (uuid-create) (buffer-file-name) (s-trim (shell-command-to-string "date --rfc-email"))))
-
-  (add-hook 'find-file-hook 'find-file-mysql)
-#+end_src
-
 ** Goto heading org
 #+begin_src emacs-lisp
   (defun keo/org-file-jump-to-heading (org-file heading-title)
@@ -1323,40 +796,45 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
 #+end_src
 
 ** WM
-*** Goto heading in emacs config
-#+begin_src emacs-lisp
-
-  
-#+end_src
 *** Window rules
 #+begin_src emacs-lisp
   (setq window-rules
         '(("Emacs Dired" . (("instance" . "Emacs-Dired")
                             ("class" . "Emacs")
-                            ("floating" . "true")))
+                            ("floating" . "on")))
           ("Discord" . (("class" . "discord")
                         ("tag" . "chat")))
           ("firefox" . (("class" . "firefox")
-                        ("tag" . "www")))))
+                        ("tag" . "www")))
+          ("Mpv Fullscreen" . (("instance" . "mpvFullscreen")
+                               ("fullscreen" . "on")))
+          ("Emacs Config" . (("instance" . "Emacs-Config")
+                             ("floating" . "on")
+                             ("floatplacement" . "center")))
+          ("Emacs-Dired" . (("instance" . "Emacs-Dired")
+                            ("floating" . "on")
+                            ("floatplacement" . "center")))
+          ("Config" . (("instance" . "Config")
+                       ("class" . "Emacs")
+                       ("tag" . "config")))))
 
-  (defun keo/wm-window-rules ()
-    (s-join
-     "\n"
-     (mapcar
-      (lambda (rule)
-        (format
-         "herbstclient rule %s"
-         (s-join
-          " "
-          (mapcar
-           (lambda (arg)
-             (format
-              "%s=%s"
-              (car arg)
-              (cdr arg)))
-           (cdr rule)))))
-      window-rules)))
-  (keo/wm-window-rules)
+    (defun keo/wm-window-rules ()
+      (s-join
+       ";"
+       (mapcar
+        (lambda (rule)
+          (format
+           "herbstclient rule %s"
+           (s-join
+            " "
+            (mapcar
+             (lambda (arg)
+               (format
+                "%s=%s"
+                (car arg)
+                (cdr arg)))
+             (cdr rule)))))
+        window-rules)))
 #+end_src
 
 *** Open heading emacs config
@@ -1608,184 +1086,6 @@ I like IRC so I wanna use ERC an IRC client for Emacs.
       ""))
 #+end_src
 
-** Proxmox
-#+begin_src emacs-lisp
-
-  (defvar proxmox-base-url "https://proxmox.kimane.se/api2/json")
-
-  (defun proxmox-get-vms ()
-    (interactive)
-    (defvar vms)
-    (request (format "%s/nodes/pve/qemu" proxmox-base-url)
-      :headers `(("Authorization" . ,(format "PVEAPIToken=%s" (password-store-get "proxmox/api"))))
-      :parser (lambda () (buffer-string))
-      :success (cl-function
-                (lambda (&key data &allow-other-keys)
-                  (setq vms data))))
-    vms)
-
-  (defun proxmox-get-vm-by-name (name)
-    (let* ((vms (jeison-read t (proxmox-get-vms) "data"))
-           (VM (list)))
-      (mapcar
-       (lambda (vm)
-         (if (equal name (jeison-read t vm "name"))
-             (setq VM vm)))
-       vms)
-      VM))
-
-  (defun proxmox-get-vm-by-name (vmid)
-    (let* ((vms (jeison-read t (proxmox-get-vms) "data"))
-           (VM (list)))
-      (mapcar
-       (lambda (vm)
-         (if (equal vmid (jeison-read t vm "vmid"))
-             (setq VM vm)))
-       vms)
-      VM))
-
-  (defun proxmox-get-vm-names ()
-    (let* ((vms (jeison-read t (proxmox-get-vms) "data")))
-      (mapcar
-       (lambda (vm)
-         (jeison-read t vm "name"))
-       vms)))
-
-  (defun proxmox-select-a-vm ()
-    (proxmox-get-vm-by-name (completing-read "VM: " (proxmox-get-vm-names))))
-
-  (defun proxmox-clone-vm ()
-    (interactive)
-    (let* ((vmid (jeison-read t (proxmox-select-a-vm) "vmid")))
-      (request (format "%s/nodes/pve/qemu/%s/clone" proxmox-base-url vmid)
-        :type "POST"
-        :headers `(("Authorization" . ,(format "PVEAPIToken=%s" (password-store-get "proxmox/api"))))
-        :params `(("full" . "1") ("newid" . ,(completing-read "New vm's id: " ())) ("name" . ,(completing-read "New vm's name: " ())))
-        :success (cl-function
-                  (lambda (&key data &allow-other-keys)
-                    (message "I sent: %S" (assoc-default 'form data)))))
-      vmid))
-
-  (defun proxmox-power-off-vm (&optional vmid)
-    (interactive)
-    (let* ((vmid (if vmid vmid (jeison-read t (proxmox-select-a-vm) "vmid"))))
-      (request (format "%s/nodes/pve/qemu/%s/status/stop" proxmox-base-url vmid)
-        :type "POST"
-        :headers `(("Authorization" . ,(format "PVEAPIToken=%s" (password-store-get "proxmox/api"))))
-        :success (cl-function
-                  (lambda (&key data &allow-other-keys)
-                    (message "I sent: %S" (assoc-default 'form data)))))))
-
-  (defun proxmox-power-on-vm (&optional vmid)
-    (interactive)
-    (let* ((vmid (if vmid vmid (jeison-read t (proxmox-select-a-vm) "vmid"))))
-      (request (format "%s/nodes/pve/qemu/%s/status/start" proxmox-base-url vmid)
-        :type "POST"
-        :headers `(("Authorization" . ,(format "PVEAPIToken=%s" (password-store-get "proxmox/api"))))
-        :success (cl-function
-                  (lambda (&key data &allow-other-keys)
-                    (message "I sent: %S" (assoc-default 'form data)))))))
-
-  (defun proxmox-restart-vm (&optional vmid)
-    (interactive)
-    (let* ((vmid (if vmid vmid (jeison-read t (proxmox-select-a-vm) "vmid"))))
-      (request (format "%s/nodes/pve/qemu/%s/status/reboot" proxmox-base-url vmid)
-        :type "POST"
-        :headers `(("Authorization" . ,(format "PVEAPIToken=%s" (password-store-get "proxmox/api"))))
-        :success (cl-function
-                  (lambda (&key data &allow-other-keys)
-                    (message "I sent: %S" (assoc-default 'form data)))))))
-
-  (defun proxmox-get-ip (vmid)
-    (defvar ifs)
-    (defvar IF)
-    (defvar IP)
-    (request (format "%s/nodes/pve/qemu/%s/agent/network-get-interfaces" proxmox-base-url vmid)
-      :headers `(("Authorization" . ,(format "PVEAPIToken=%s" (password-store-get "proxmox/api"))))
-      :parser (lambda () (buffer-string))
-      :success (cl-function
-                (lambda (&key data &allow-other-keys)
-                  (setq ifs data))))
-    (mapcar
-     (lambda (if)
-       (if (equal "eth0" (jeison-read t if "name"))
-           (setq IF if)))
-     (jeison-read t (jeison-read t ifs "data") "result"))
-
-    (mapcar
-     (lambda (ip)
-       (if (equal "ipv4" (jeison-read t ip "ip-address-type"))
-           (setq IP (jeison-read t ip "ip-address"))))
-     (jeison-read t IF "ip-addresses"))
-    IP)
-
-  (proxmox-get-ip "3000")
-  (proxmox-restart-vm)
-  (proxmox-get-vm-by-name "proxy.kimane.se")
-#+end_src
-
-** pfSense
-#+begin_src emacs-lisp
-  (setq shell-file-name "bash")
-  (setq pfsense-base-url "https://pfsense.kimane.se:9123/fauxapi/v1/?action=")
-
-  (defun pfsense-fauxapi-auth (fauxapi_apikey fauxapi_apisecret)
-    (setq fauxapi_timestamp
-          (s-trim
-           (shell-command-to-string
-            "date -u +%Y%m%dZ%H%M%S")))
-    (setq fauxapi_nonce
-          (s-trim
-           (shell-command-to-string
-            "head -c 40 /dev/urandom | (md5sum 2>/dev/null  || md5 2>/dev/null) | head -c 8")))
-    (setq fauxapi_hash
-          (s-trim
-           (shell-command-to-string
-            (format
-             "echo -n %s%s%s | (sha256sum 2>/dev/null  || shasum -a 256 2>/dev/null) | cut -d' ' -f1"
-             fauxapi_apisecret
-             fauxapi_timestamp
-             fauxapi_nonce))))
-    (setq fauxapi_auth
-          (format
-           "%s:%s:%s:%s"
-           fauxapi_apikey
-           fauxapi_timestamp
-           fauxapi_nonce
-           fauxapi_hash))
-    fauxapi_auth)
-
-  (defun pfsense-gateway-status ()
-    (defvar status)
-    (request
-      (format
-       "%sgateway_status"
-       pfsense-base-url)
-      :headers `(("fauxapi-auth" . ,(pfsense-fauxapi-auth
-                                     "PFFAMy4j8IuCv5VYsJFcsfQj"
-                                     "rWLYcZtv7WfmevCWegzswr09AZp1so1Zi83v8vyP7ycGiQQzXPuW0Gyfv4ym")))
-      :success (cl-function
-                (lambda (&key data &allow-other-keys)
-                  (setq status
-                        (jeison-read t data "data")))))
-    status)
-
-  (defun pfsense-firewall-nat-new (source-if dest-ip dest-port)
-    (defvar rules)
-    (request
-      (format
-       "%sconfig_get"
-       pfsense-base-url)
-      :headers `(("fauxapi-auth" . ,(pfsense-fauxapi-auth
-                                     "PFFAMy4j8IuCv5VYsJFcsfQj"
-                                     "rWLYcZtv7WfmevCWegzswr09AZp1so1Zi83v8vyP7ycGiQQzXPuW0Gyfv4ym")))
-      :success (cl-function
-                (lambda (&key data &allow-other-keys)
-                  (message "%s"
-                           (jeison-read t (jeison-read t (jeison-read t data "data") "config") "nat")))))
-    rules)
-#+end_src
-
 ** Org agenda
 I wanna have a function to open org agenda in a new frame with another instance name som my window manager can manage the placement of the window.
 #+begin_src emacs-lisp
@@ -1806,40 +1106,247 @@ I wanna have a function to open org agenda in a new frame with another instance 
 
 #+end_src
 
-** Awesomewm new client
+* Window Management
+** Dynamic Window Management with edwina
 #+begin_src emacs-lisp
-  ;;(emacsql emacs-db [:create-table files
-  ;;           ([id name date])])
-
-  ;;(emacsql emacs-db [:drop-table files])
-
-  (cl-defun keo/awesomewm-new-client (&key id name class)
-    (emacsql awesomewm-db [:insert :into clients 
-                                   :values ([$s1 $s2 $s3])]
-             id name class))
-  (cl-defun keo/awesomewm-remove-client (&key id)
-    (emacsql awesomewm-db [:delete :from clients
-                                   :where (= id $s1)]
-             id))
-  (cl-defun keo/awesomewm-rename-client (&key id name class)
-    (emacsql awesomewm-db [:delete :from clients
-                                   :where (= id $s1)]
-             id)
-    (emacsql awesomewm-db [:insert :into clients 
-                                   :values ([$s1 $s2])]
-             id name class))
+  (use-package edwina
+    :config
+    (setq display-buffer-base-action '(display-buffer-below-selected))
+    (edwina-setup-dwm-keys)
+    (edwina-mode 1))
 #+end_src
 
-** Awesomewm notify
+** Window Selection with ace-window
 #+begin_src emacs-lisp
-  (cl-defun awesomewm-notify (&key title text)
-    (start-process-shell-command "awesome-client" nil (format "
-  awesome-client '
-  naughty = require(\"naughty\")
-  naughty.notify({
-  title=\"%s\",
-  text=\"%s\"})
-  '" title text)))
-  
+  (use-package ace-window
+    :bind (("M-o" . ace-window))
+    :custom
+    (aw-scope 'frame)
+    (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+    (aw-minibuffer-flag t)
+    :config
+    (ace-window-display-mode 1))
 #+end_src
+
+** Window History with winner-mode
+#+begin_src emacs-lisp
+  (use-package winner
+    :ensure nil
+    :after evil
+    :config
+    (winner-mode)
+    (define-key evil-window-map "u" 'winner-undo)
+    (define-key evil-window-map "U" 'winner-redo))
+#+end_src
+
+* Keep Folders Clean
+#+begin_src emacs-lisp
+  (setq backup-directory-alist `(("." . ,(expand-file-name "tmp/backups/" user-emacs-directory))))
+
+
+  ;; auto-save-mode doesn't create the path automatically!
+  (make-directory (expand-file-name "tmp/auto-saves/" user-emacs-directory) t)
+
+  (setq auto-save-list-file-prefix (expand-file-name "tmp/auto-saves/sessions/" user-emacs-directory)
+        auto-save-file-name-transforms `((".*" ,(expand-file-name "tmp/auto-saves/" user-emacs-directory) t)))
+
+  (setq create-lockfiles nil)
+
+  (setq projectile-known-projects-file (expand-file-name "tmp/projectile-bookmarks.eld" user-emacs-directory)
+        lsp-session-file (expand-file-name "tmp/.lsp-session-v1" user-emacs-directory))
+
+  (use-package no-littering)
+#+end_src
+
+* Development
+** Git
+Magit
+#+begin_src emacs-lisp
+  (use-package magit
+    :bind ("C-M-;" . magit-status)
+    :commands (magit-status magit-get-current-branch)
+    :custom
+    (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+#+end_src
+
+Magit todos
+#+begin_src emacs-lisp
+  (use-package magit-todos)
+#+end_src
+
+Projectile
+#+begin_src emacs-lisp
+  (defun dw/switch-project-action ()
+    "Switch to a workspace with the project name and start `magit-status'."
+    ;; TODO: Switch to EXWM workspace 1?
+    (persp-switch (projectile-project-name))
+    (magit-status))
+
+  (use-package projectile
+    :diminish projectile-mode
+    :config (projectile-mode)
+    :demand t
+    :bind-keymap
+    ("C-c p" . projectile-command-map)
+    :init
+    (when (file-directory-p "~/Projects")
+      (setq projectile-project-search-path '("~/Projects")))
+    (setq projectile-switch-project-action #'dw/switch-project-action))
+
+  (use-package counsel-projectile
+    :after projectile
+    :bind (("C-M-p" . counsel-projectile-find-file))
+    :config
+    (counsel-projectile-mode))
+#+end_src
+
+
+** Languages
+*** Language server support with eglot
+#+begin_src emacs-lisp
+  (use-package eglot
+    :bind (:map eglot-mode-map
+                ("C-c C-a" . eglot-code-actions)
+                ("C-c C-r" . eglot-rename))
+    :config
+    (setq eglot-autoshutdown t
+          eglot-confirm-server-initiated-edits nil)
+    (add-to-list 'eglot-server-programs
+                 '((js2-mode typescript-mode) . ("typescript-language-server" "--stdio"))))
+#+end_src
+
+*** Debug Adapter Support
+#+begin_src emacs-lisp
+  (use-package dap-mode)
+#+end_src
+
+*** Meta Lisp
+#+begin_src emacs-lisp
+  (use-package lispy
+    :hook ((emacs-lisp-mode . lispy-mode)
+           (scheme-mode . lispy-mode)))
+
+  (use-package lispyville
+    :hook ((lispy-mode . lispyville-mode))
+    :config
+    (lispyville-set-key-theme '(operators c-w additional
+                                          additional-movement slurp/barf-cp
+                                          prettify)))
+#+end_src
+
+*** Emacs Lisp
+#+begin_src emacs-lisp
+  (use-package helpful
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    ([remap describe-function] . helpful-function)
+    ([remap describe-symbol] . helpful-symbol)
+    ([remap describe-variable] . helpful-variable)
+    ([remap describe-command] . helpful-command)
+    ([remap describe-key] . helpful-key))
+
+  (use-package highlight-defined
+    :hook (emacs-lisp-mode . highlight-defined-mode))
+
+  (use-package elmacro
+    :hook (emacs-lisp-mode . elmacro-mode))
+
+  (use-package easy-escape
+    :hook ((emacs-lisp-mode . easy-escape-minor-mode)
+           (lisp-mode       . easy-escape-minor-mode)))
+#+end_src
+
+*** Common Lisp
+#+begin_src emacs-lisp
+  (use-package slime
+    :config
+    (setq inferior-lisp-program "sbcl"))
+#+end_src
+
+*** Scheme
+#+begin_src emacs-lisp
+  (use-package geiser)
+  (use-package geiser-guile)
+#+end_src
+
+*** TypeScript
+#+begin_src emacs-lisp
+  (use-package typescript-mode
+    :mode "\\.ts\\'"
+    :hook (typescript-mode . lsp-deferred)
+    :config
+    (setq typescript-indent-level 2)
+    (require 'dap-node))
+#+end_src
+
+*** Nix
+#+begin_src emacs-lisp
+  (use-package nix-mode
+    :mode "\\.nix\\'")
+#+end_src
+
+*** Rust
+#+begin_src emacs-lisp
+  (use-package rust-mode
+    :mode "\\.rs\\'"
+    :hook (rust-mode . lsp-deferred))
+#+end_src
+
+*** Lua
+#+begin_src emacs-lisp
+  (use-package lua-mode
+    :mode "\\.lua\\'"
+    :hook (lua-mode . lsp-deferred))
+#+end_src
+
+*** Fennel
+#+begin_src emacs-lisp
+  (use-package fennel-mode
+    :mode "\\.fnl\\'")
+#+end_src
+** Snippets with yasnippet
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :config
+    (setq yas-snippet-dirs '("~/emacs/snippets"))
+    (yas-global-mode 0))
+
+  (use-package tempel
+    ;; Require trigger prefix before template name when completing.
+    ;; :custom
+    ;; (tempel-trigger-prefix "<")
+
+    :bind (("M-+" . tempel-expand) ;; Alternative tempel-expand
+           ("M-*" . tempel-insert))
+
+    :init
+
+    ;; Setup completion at point
+    (defun tempel-setup-capf ()
+      ;; Add the Tempel Capf to `completion-at-point-functions'.
+      ;; `tempel-expand' only triggers on exact matches. Alternatively use
+      ;; `tempel-complete' if you want to see all matches, but then you
+      ;; should also configure `tempel-trigger-prefix', such that Tempel
+      ;; does not trigger too often when you don't expect it. NOTE: We add
+      ;; `tempel-expand' *before* the main programming mode Capf, such
+      ;; that it will be tried first.
+      (setq-local completion-at-point-functions
+                  (cons #'tempel-expand
+                        completion-at-point-functions)))
+
+    (add-hook 'prog-mode-hook 'tempel-setup-capf)
+    (add-hook 'text-mode-hook 'tempel-setup-capf)
+    (add-hook 'emacs-lisp-mode-hook 'tempel-setup-capf)
+
+    ;; Optionally make the Tempel templates available to Abbrev,
+    ;; either locally or globally. `expand-abbrev' is bound to C-x '.
+    (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+    (global-tempel-abbrev-mode)
+  )
+  (use-package tempel-collection)
+
+#+end_src
+
 

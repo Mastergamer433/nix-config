@@ -19,7 +19,7 @@ in {
       picom.backend = "glx";
       xserver.windowManager.herbstluftwm.enable = true;
     };
-    user.packages = with pkgs; [ nitrogen conky dzen2 ];
+    user.packages = with pkgs; [ nitrogen conky dzen2 devour ];
 
     home.file = {
       ".config/herbstluftwm" = {

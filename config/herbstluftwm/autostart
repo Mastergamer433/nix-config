@@ -162,9 +162,11 @@ hc rule title='Oracle VM VirtualBox Manager' tag=5
 hc rule class=VirtualBox pseudotile=on
 hc rule class=VirtualBox fullscreen=on
 hc rule instance=mpvFullscreen fullscreen=on
+hc rule instance=swallow hook=swallow
 hc rule instance=Emacs-Config floating=on floatplacement=center
 hc rule instance=Emacs-Dired floating=on floatplacement=center
 hc rule instance=Config class=Emacs tag=config
+for i in "${my_array[@]}"; do exec $(echo $i | tr -d '"'); done
 hc rule focus=on # normally focus new clients
 #hc rule focus=off # normally do not focus new clients
 # give focus to most common terminals

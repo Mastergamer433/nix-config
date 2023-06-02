@@ -1,0 +1,22 @@
+{ options, config, lib, pkgs, ... }:
+
+with lib;
+with lib.my;
+let cfg = config.modules.services.spotifyd;
+in {
+  options.modules.services.spotifyd = {
+    enable = mkBoolOpt false;
+  };
+
+  config = mkIf cfg.enable {
+    services.spotifyd = {
+      enable = true;
+      settings = {
+        global = {
+          username = "brodrostklockan";
+          password_cmd = "spotify-password";
+        };
+      };
+    };
+  };
+}

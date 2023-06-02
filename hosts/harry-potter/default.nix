@@ -17,6 +17,7 @@
         dbeaver.enable = true;
         mbsync.enable = true;
         element.enable = true;
+        dunst.enable = true;
         #kmonad.enable = true;
       };
       term = {
@@ -57,7 +58,13 @@
       unity.enable = true;
     };
     shell = {
-      fish.enable = true;
+      fish = {
+        enable = true;
+        aliases = {
+          "mpv" = "devour mpv";
+          "feh" = "devour feh";
+        };
+      };
       starship.enable = true;
       pass.enable = true;
       gnupg.enable = true;
@@ -75,16 +82,15 @@
     }; 
     backup.enable = true;
   };
-
   ## Local config
   networking.wireguard.interfaces = {
     wg0 = {
-      ips = [ "10.10.10.2/24" "2001:470:de51:1010::2/64" ];
+      ips = [ "10.81.92.2/24" "2001:470:de51:8192::2/64" ];
       privateKeyFile = config.age.secrets.wireguard.path;
       peers = [
         { 
-        publicKey = "tnwFMErFdkJWUh64+9n2e5K/SSIQoD1VNBfxYdIK3kg=";
-        allowedIPs = [ "10.10.10.0/24" "::/0" ];
+        publicKey = "SuU29nPvFW2HncOcdVmLVWhd4O5GXQntmZ5Ob0eUdW8=";
+        allowedIPs = [ "10.81.92.0/24" "192.168.21.0/24" "::/0" ];
         endpoint = "kimane.se:51820";
         persistentKeepalive = 25;
         }
