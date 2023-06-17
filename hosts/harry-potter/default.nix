@@ -91,14 +91,14 @@
         { 
         publicKey = "SuU29nPvFW2HncOcdVmLVWhd4O5GXQntmZ5Ob0eUdW8=";
         allowedIPs = [ "10.81.92.0/24" "192.168.21.0/24" "::/0" ];
-        endpoint = "kimane.se:51820";
+        endpoint = "84.216.24.189:51820";
         persistentKeepalive = 25;
         }
       ];
     };
   };
   networking.nameservers = ["192.168.21.228" "1.1.1.1"];
-  environment.systemPackages = with pkgs; [ ntfs3g dmenu pcmanfm teams ];
+  environment.systemPackages = with pkgs; [ ntfs3g dmenu pcmanfm teams pkgs.cifs-utils ];
   programs.ssh.startAgent = true;
   services.openssh.startWhenNeeded = true;
 

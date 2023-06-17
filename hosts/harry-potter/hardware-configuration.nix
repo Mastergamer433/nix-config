@@ -44,6 +44,12 @@
     options = [ "subvol=nixos" ];
   };
 
+  fileSystems."/samba-shares/quick-file-share" = {
+    device = "//10.1.10.20/quick-file-share";
+    fsType = "cifs";
+    options = [ "credentials=${config.age.secrets.samba-credentials.path}"];
+  };
+
   swapDevices = [ ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
@@ -58,6 +64,6 @@
   hardware.cpu.intel.updateMicrocode =
     lib.mkDefault config.hardware.enableRedistributableFirmware;
   # high-resolution display
-  hardware.video.hidpi.enable = lib.mkDefault true;
+  #hardware.video.hidpi.enable = lib.mkDefault true;
 }
 

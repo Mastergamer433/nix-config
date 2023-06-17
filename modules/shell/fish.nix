@@ -20,7 +20,7 @@ in {
 
   config = mkIf cfg.enable {
     users.defaultUserShell = pkgs.fish;
-
+    programs.fish.enable = true;
     home-manager.programs.fish = {
       enable = true;
       interactiveShellInit = 

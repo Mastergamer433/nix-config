@@ -15,7 +15,7 @@ in {
     home.file = {
       ".mbsyncrc".text = ''
 IMAPAccount kimane
-Host mail.kimane.se
+Host esp01.zyner.net
 User mg433@kimane.se
 PassCmd "pass email/kimane.se/mg433"
 SSLType IMAPS

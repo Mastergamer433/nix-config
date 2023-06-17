@@ -360,6 +360,7 @@
   "de"  '((lambda () (interactive) (dired "~/.dotfiles/config/emacs")) :which-key ".emacs.d")
   "b" '(:ignore t :which-key "Buffer")
   "bs" '(consult-buffer :which-key "Switch Buffer")
+  "bd" '(display-line-numbers-mode :which-key "Display Line Numbers Toggle")
   "fd" '(:ignore t :which-key "dotfiles")
   "fde" '((lambda () (interactive) (find-file "~/.dotfiles/config/emacs/Emacs.org")))
   "p" '(:ignore t :which-key "Pass")
@@ -395,7 +396,7 @@
                   (mu4e-sent-folder  . "/Sent Mail")
                   (mu4e-refile-folder  . "/All Mail")
                   (mu4e-trash-folder  . "/Trash")
-                  (smtpmail-smtp-server . "mail.kimane.se")
+                  (smtpmail-smtp-server . "esp01.zyner.net")
                   (smtpmail-smtp-service . 465)
                   (smtpmail-stream-type . ssl)))))
 
@@ -618,35 +619,43 @@
   (org-show-subtree)
   (forward-line))
 
-
-
 (setq window-rules
       '(("Emacs Dired" . (("instance" . "Emacs-Dired")
                           ("class" . "Emacs")
-                          ("floating" . "true")))
+                          ("floating" . "on")))
         ("Discord" . (("class" . "discord")
                       ("tag" . "chat")))
         ("firefox" . (("class" . "firefox")
-                      ("tag" . "www")))))
+                      ("tag" . "www")))
+        ("Mpv Fullscreen" . (("instance" . "mpvFullscreen")
+                             ("fullscreen" . "on")))
+        ("Emacs Config" . (("instance" . "Emacs-Config")
+                           ("floating" . "on")
+                           ("floatplacement" . "center")))
+        ("Emacs-Dired" . (("instance" . "Emacs-Dired")
+                          ("floating" . "on")
+                          ("floatplacement" . "center")))
+        ("Config" . (("instance" . "Config")
+                     ("class" . "Emacs")
+                     ("tag" . "config")))))
 
-(defun keo/wm-window-rules ()
-  (s-join
-   "\n"
-   (mapcar
-    (lambda (rule)
-      (format
-       "herbstclient rule %s"
-       (s-join
-        " "
-        (mapcar
-         (lambda (arg)
-           (format
-            "%s=%s"
-            (car arg)
-            (cdr arg)))
-         (cdr rule)))))
-    window-rules)))
-(keo/wm-window-rules)
+  (defun keo/wm-window-rules ()
+    (s-join
+     ";"
+     (mapcar
+      (lambda (rule)
+        (format
+         "herbstclient rule %s"
+         (s-join
+          " "
+          (mapcar
+           (lambda (arg)
+             (format
+              "%s=%s"
+              (car arg)
+              (cdr arg)))
+           (cdr rule)))))
+      window-rules)))
 
 (defun keo/wm-open-heading-emacs-config ()
   (find-file

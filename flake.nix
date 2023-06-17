@@ -42,7 +42,7 @@
         };
       pkgs = mkPkgs nixpkgs [ ];
 
-      scheme = "dracula";
+      scheme = "material-palenight";
 
       lib = nixpkgs.lib.extend (self: super: {
         my = import ./lib {
