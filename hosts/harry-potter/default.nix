@@ -64,7 +64,7 @@
           "mpv" = "devour mpv";
           "feh" = "devour feh";
         };
-      };
+luick-file-share      };
       starship.enable = true;
       pass.enable = true;
       gnupg.enable = true;

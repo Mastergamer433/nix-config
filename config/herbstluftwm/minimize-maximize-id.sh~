@@ -1,8 +1,0 @@
-#!/bin/sh
-tag=$(herbstclient list_monitors | grep '\[FOCUS\]' | cut -d'"' -f2)
-if [[ $@ = +1 ]]; then
-  herbstclient dump “‘$tag” || herbstclient add “‘$tag”
-  herbstclient move “‘$tag”
-else
-  herbstclient dump “‘$tag” && herbstclient chain . lock . bring $2 . unlock
-fi

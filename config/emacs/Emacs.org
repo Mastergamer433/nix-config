@@ -440,30 +440,91 @@ display-time-world command provides a nice display of the time at a specified li
 ** General leader key
 #+begin_src emacs-lisp
   (keo/leader-keys
-    "e" '(:ignore t :which-key "ERC")
-    "ej" '(lambda () (interactive)
-            (insert "/join #") :which-key "Join")
-    "eq" '(lambda () (interactive)
-            (insert "/quit")
-            (erc-send-current-line) :which-key "Quit")
-    "d"   '(:ignore t :which-key "dired")
-    "m"   '(:ignore t :which-key "Matrix")
-    "mk"  '((lambda () (interactive) (ement-room-view "#kimane:kimane.se")) :which-key "View room Kimane")
-    "dd"  '(dired :which-key "Here")
-    "dh"  '((lambda () (interactive) (dired "~")) :which-key "Home")
-    "dn"  '((lambda () (interactive) (dired "~/Notes")) :which-key "Notes")
-    "do"  '((lambda () (interactive) (dired "~/Downloads")) :which-key "Downloads")
-    "d."  '((lambda () (interactive) (dired "~/.dotfiles")) :which-key "dotfiles")
-    "de"  '((lambda () (interactive) (dired "~/.dotfiles/config/emacs")) :which-key ".emacs.d")
-    "b" '(:ignore t :which-key "Buffer")
-    "bs" '(consult-buffer :which-key "Switch Buffer")
-    "bd" '(display-line-numbers-mode :which-key "Display Line Numbers Toggle")
-    "fd" '(:ignore t :which-key "dotfiles")
-    "fde" '((lambda () (interactive) (find-file "~/.dotfiles/config/emacs/Emacs.org")))
-    "p" '(:ignore t :which-key "Pass")
-    "pp" '(password-store-copy :which-key "Copy")
-    "pn" '(password-store-insert :which-key "New")
-    "pg" '(password-store-generate :which-key "Generate"))
+    "e"
+    '(:ignore t :which-key "ERC")
+    "ej"
+    '(lambda
+       ()
+       (interactive)
+       (insert "/join #")
+       :which-key "Join")
+    "eq"
+    '(lambda
+       ()
+       (interactive)
+       (insert "/quit")
+       (erc-send-current-line)
+       :which-key "Quit")
+    "d"
+    '(:ignore t :which-key "dired")
+    "m"
+    '(:ignore t :which-key "Matrix")
+    "mc"
+    '((lambda ()
+        (interactive)
+        (ement-connect
+         :user-id "@mg433:kimane.se"
+         :password (password-store-get
+                    "matrix/kimane/mg433")
+         :uri-prefix "https://matrix.kimane.se"))
+      :which-key "View room Kimane")
+    "dd"
+    '(dired :which-key "Here")
+    "dh"
+    '((lambda ()
+        (interactive)
+        (dired "~"))
+      :which-key "Home")
+    "dn"
+    '((lambda ()
+        (interactive)
+        (dired "~/Notes"))
+      :which-key "Notes")
+    "do"
+    '((lambda ()
+        (interactive)
+        (dired "~/Downloads"))
+      :which-key "Downloads")
+    "d."
+    '((lambda ()
+        (interactive)
+        (dired "~/.dotfiles"))
+      :which-key "dotfiles")
+    "de"
+    '((lambda ()
+        (interactive)
+        (dired
+         "~/.dotfiles/config/emacs"))
+      :which-key ".emacs.d")
+    "b"
+    '(:ignore t :which-key "Buffer")
+    "bs"
+    '(consult-buffer
+      :which-key "Switch Buffer")
+    "bd"
+    '(display-line-numbers-mode
+      :which-key "Display Line Numbers Toggle")
+    "fd"
+    '(:ignore t
+              :which-key "dotfiles")
+    "fde"
+    '((lambda ()
+        (interactive)
+        (find-file
+         "~/.dotfiles/config/emacs/Emacs.org")))
+    "p"
+    '(:ignore t :which-key "Pass")
+    "pp"
+    '(password-store-copy
+      :which-key "Copy")
+    "pn"
+    '(password-store-insert
+      :which-key "New")
+    "pg"
+    '(password-store-generate
+      :which-key "Generate"))
+
+  (ement-connect)
 #+end_src
 
 * Applications

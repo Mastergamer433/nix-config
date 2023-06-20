@@ -44,8 +44,8 @@
     options = [ "subvol=nixos" ];
   };
 
-  fileSystems."/samba-shares/quick-file-share" = {
-    device = "//10.1.10.20/quick-file-share";
+  fileSystems."/samba-shares/mappen" = {
+    device = "//10.1.10.20/mappen";
     fsType = "cifs";
     options = [ "credentials=${config.age.secrets.samba-credentials.path}"];
   };

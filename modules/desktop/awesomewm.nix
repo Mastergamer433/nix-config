@@ -20,6 +20,7 @@ in {
       picom.backend = "glx";
       xserver = {
         windowManager.awesome = {
+          package = pkgs.myAwesome;
           enable = true;
           luaModules = with pkgs.luaPackages; [
             luarocks # is the package manager for Lua modules
@@ -28,7 +29,7 @@ in {
         };
       };
     };
-    user.packages = with pkgs; [ nitrogen conky dzen2 ];
+    user.packages = with pkgs; [ nitrogen conky dzen2 fontconfig ];
 
     home.file = {
       ".config/awesome/" = {
