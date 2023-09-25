@@ -10,7 +10,14 @@
     [ "xhci_pci" "ahci" "nvme" "usbhid" "usb_storage" "sd_mod" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" "v4l2loopback" "snd_aloop" "uinput" ];
-  boot.extraModulePackages = [ ];
+  boot.extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback.out ];
+  # Set initial kernel module settings
+  boot.extraModprobeConfig = ''
+    # exclusive_caps: Skype, Zoom, Teams etc. will only show device when actually streaming
+    # card_label: Name of virtual camera, how it'll show up in Skype, Zoom, Teams
+    # https://github.com/umlaeute/v4l2loopback
+    options v4l2loopback exclusive_caps=1 card_label="Virtual Camera"
+  '';
 
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/397fcf44-2458-4014-8e38-32255fa4b443";
@@ -18,7 +25,7 @@
     options = [ "subvol=nixos/@" "compress=zstd" "ssd" ];
   };
 
-  boot.initrd.luks.devices."root".device =
+  boot.initrd.luks.devices."system".device =
     "/dev/disk/by-uuid/0b88f4ac-70ed-442b-b43e-ffd703b9cf8d";
 
   fileSystems."/home" = {
@@ -34,7 +41,7 @@
   };
 
   fileSystems."/efi" = {
-    device = "/dev/disk/by-uuid/DFC6-AEF9";
+    device = "/dev/disk/by-uuid/3B83-6815";
     fsType = "vfat";
   };
 
@@ -44,12 +51,16 @@
     options = [ "subvol=nixos" ];
   };
 
-  fileSystems."/samba-shares/mappen" = {
-    device = "//10.1.10.20/mappen";
-    fsType = "cifs";
-    options = [ "credentials=${config.age.secrets.samba-credentials.path}"];
+  fileSystems."/home/mg433/nas/mappen" = {
+    device = "10.1.10.30:/mnt/pool/mappen";
+    fsType = "nfs";
   };
-
+ 
+  fileSystems."/home/mg433/nas/mg433" = {
+    device = "10.1.10.30:/mnt/pool/users/mg433";
+    fsType = "nfs";
+  };
+ 
   swapDevices = [ ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking

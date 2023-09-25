@@ -27,7 +27,6 @@ with lib.my; {
   boot = {
     loader = {
       grub.enable = mkDefault true;
-      grub.version = mkDefault 2;
       grub.efiSupport = mkDefault true;
       efi = {
         canTouchEfiVariables = mkDefault true;

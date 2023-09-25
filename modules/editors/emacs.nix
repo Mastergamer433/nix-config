@@ -41,6 +41,7 @@ in {
       mu
       sbcl
       haskell-language-server
+      pandoc
     ];
 
     home-manager.systemd.user.services."emacs" = mkIf cfg.daemonEnable {

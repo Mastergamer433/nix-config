@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }: {
+{ pkgs, inputs, config, lib, ... }: {
   imports = [ ../home.nix ./hardware-configuration.nix ];
   ## Modules
   modules = {
@@ -8,6 +8,7 @@
       xmonad.enable = true;
       awesome.enable = true;
       dwm.enable = true;
+      bspwm.enable = true;
       apps = {
         discord.enable = true;
         polybar.enable = true;
@@ -64,7 +65,7 @@
           "mpv" = "devour mpv";
           "feh" = "devour feh";
         };
-luick-file-share      };
+      };
       starship.enable = true;
       pass.enable = true;
       gnupg.enable = true;
@@ -78,34 +79,35 @@ luick-file-share      };
     services = {
       ssh.enable = true;
       #syncthing.enable = true;
-      mysql.enable = true;
+      #mysql.enable = true;
+      docker.enable = true;
     }; 
     backup.enable = true;
   };
   ## Local config
-  networking.wireguard.interfaces = {
-    wg0 = {
-      ips = [ "10.81.92.2/24" "2001:470:de51:8192::2/64" ];
-      privateKeyFile = config.age.secrets.wireguard.path;
-      peers = [
-        { 
-        publicKey = "SuU29nPvFW2HncOcdVmLVWhd4O5GXQntmZ5Ob0eUdW8=";
-        allowedIPs = [ "10.81.92.0/24" "192.168.21.0/24" "::/0" ];
-        endpoint = "84.216.24.189:51820";
-        persistentKeepalive = 25;
-        }
-      ];
-    };
-  };
-  networking.nameservers = ["192.168.21.228" "1.1.1.1"];
-  environment.systemPackages = with pkgs; [ ntfs3g dmenu pcmanfm teams pkgs.cifs-utils ];
+  #networking.wireguard.interfaces = {
+  #  wg0 = {
+  #    ips = [ "10.81.92.3/24" "2600:70ff:b165:8192::3/64" ];
+  #    privateKeyFile = config.age.secrets.wireguard.path;
+  #    peers = [
+ #       { 
+  #      publicKey = "VyY1kJ1AjvMpJUvu0g1dKrdKp+49/z6lGghe78nB6Cc=";
+  #      allowedIPs = [ "10.81.92.0/24" "::/0" ];
+  #      endpoint = "kimane.se:3010";
+  #      persistentKeepalive = 25;
+  #      }
+  #    ];
+  #  };
+  #};
+  networking.nameservers = ["10.1.10.72" "1.1.1.1"];
+  environment.systemPackages = with pkgs; [ feh ntfs3g dmenu pcmanfm teams pkgs.cifs-utils libnotify ];
   programs.ssh.startAgent = true;
   services.openssh.startWhenNeeded = true;
 
   networking.networkmanager.enable = true;
-  networking.networkmanager.insertNameservers = ["192.168.21.228" "1.1.1.1"];
+  networking.networkmanager.insertNameservers = ["10.1.10.72" "1.1.1.1"];
   networking.networkmanager.dns = "none";
-
+  services.gvfs.enable = true;
   i18n = {
     defaultLocale = "en_US.UTF-8";
     extraLocaleSettings = {
@@ -121,4 +123,10 @@ luick-file-share      };
     };
   };
   boot = { loader = { grub = { device = "nodev"; }; }; };
+  networking.extraHosts = ''
+    192.168.1.1   router.home
+    # Hosts
+    84.216.24.189 virtualmin.kimane.se
+  '';
+
 }

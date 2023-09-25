@@ -17,6 +17,7 @@ in {
         unredir-if-possible = false;
       };
       picom.backend = "glx";
+      clipmenu.enable = true;
       xserver.windowManager.herbstluftwm.enable = true;
     };
     user.packages = with pkgs; [ nitrogen conky dzen2 devour ];

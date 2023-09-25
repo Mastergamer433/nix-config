@@ -85,7 +85,9 @@
         ("America/New_York" "New York")
         ("Pacific/Auckland" "Auckland")
         ("Asia/Shanghai" "Shanghai")
-        ("Asia/Kolkata" "Hyderabad")))
+        ("Asia/Kolkata" "Hyderabad"))
+
+      )
 (setq display-time-world-time-format "%a, %d %b %I:%M %p %Z")
 
 (use-package savehist
@@ -345,28 +347,89 @@
   :global-prefix "C-SPC"))
 
 (keo/leader-keys
-  "e" '(:ignore t :which-key "ERC")
-  "ej" '(lambda () (interactive)
-          (insert "/join #") :which-key "Join")
-  "eq" '(lambda () (interactive)
-          (insert "/quit")
-          (erc-send-current-line) :which-key "Quit")
-  "d"   '(:ignore t :which-key "dired")
-  "dd"  '(dired :which-key "Here")
-  "dh"  '((lambda () (interactive) (dired "~")) :which-key "Home")
-  "dn"  '((lambda () (interactive) (dired "~/Notes")) :which-key "Notes")
-  "do"  '((lambda () (interactive) (dired "~/Downloads")) :which-key "Downloads")
-  "d."  '((lambda () (interactive) (dired "~/.dotfiles")) :which-key "dotfiles")
-  "de"  '((lambda () (interactive) (dired "~/.dotfiles/config/emacs")) :which-key ".emacs.d")
-  "b" '(:ignore t :which-key "Buffer")
-  "bs" '(consult-buffer :which-key "Switch Buffer")
-  "bd" '(display-line-numbers-mode :which-key "Display Line Numbers Toggle")
-  "fd" '(:ignore t :which-key "dotfiles")
-  "fde" '((lambda () (interactive) (find-file "~/.dotfiles/config/emacs/Emacs.org")))
-  "p" '(:ignore t :which-key "Pass")
-  "pp" '(password-store-copy :which-key "Copy")
-  "pn" '(password-store-insert :which-key "New")
-  "pg" '(password-store-generate :which-key "Generate"))
+  "e"
+  '(:ignore t :which-key "ERC")
+  "ej"
+  '(lambda
+     ()
+     (interactive)
+     (insert "/join #")
+     :which-key "Join")
+  "eq"
+  '(lambda
+     ()
+     (interactive)
+     (insert "/quit")
+     (erc-send-current-line)
+     :which-key "Quit")
+  "d"
+  '(:ignore t :which-key "dired")
+  "m"
+  '(:ignore t :which-key "Matrix")
+  "mc"
+  '((lambda ()
+      (interactive)
+      (ement-connect
+       :user-id "@mg433:kimane.se"
+       :password (password-store-get
+                  "matrix/kimane/mg433")
+       :uri-prefix "https://matrix.kimane.se"))
+    :which-key "View room Kimane")
+  "dd"
+  '(dired :which-key "Here")
+  "dh"
+  '((lambda ()
+      (interactive)
+      (dired "~"))
+    :which-key "Home")
+  "dn"
+  '((lambda ()
+      (interactive)
+      (dired "~/Notes"))
+    :which-key "Notes")
+  "do"
+  '((lambda ()
+      (interactive)
+      (dired "~/Downloads"))
+    :which-key "Downloads")
+  "d."
+  '((lambda ()
+      (interactive)
+      (dired "~/.dotfiles"))
+    :which-key "dotfiles")
+  "de"
+  '((lambda ()
+      (interactive)
+      (dired
+       "~/.dotfiles/config/emacs"))
+    :which-key ".emacs.d")
+  "b"
+  '(:ignore t :which-key "Buffer")
+  "bs"
+  '(consult-buffer
+    :which-key "Switch Buffer")
+  "bd"
+  '(display-line-numbers-mode
+    :which-key "Display Line Numbers Toggle")
+  "fd"
+  '(:ignore t
+            :which-key "dotfiles")
+  "fde"
+  '(lambda ()
+      (interactive)
+      (find-file
+       "~/.dotfiles/config/emacs/Emacs.org"))
+  "p"
+  '(:ignore t :which-key "Pass")
+  "pp"
+  '(password-store-copy
+    :which-key "Copy")
+  "pn"
+  '(password-store-insert
+    :which-key "New")
+  "pg"
+  '(password-store-generate
+    :which-key "Generate"))
 
 (use-package mu4e
   :ensure nil
@@ -383,37 +446,37 @@
   (setq mu4e-change-filenames-when-moving t)
 
   (setq mu4e-contexts
-        (list
-         (make-mu4e-context
-          :name "Private"
-          :match-func
-          (lambda (msg)
-            (when msg
-              (string-prefix-p "/" (mu4e-message-field msg :maildir))))
-          :vars '((user-mail-address . "mg433@kimane.se")
-                  (user-full-name    . "Karl Elis Odenhage")
-                  (mu4e-drafts-folder  . "/Drafts")
-                  (mu4e-sent-folder  . "/Sent Mail")
-                  (mu4e-refile-folder  . "/All Mail")
-                  (mu4e-trash-folder  . "/Trash")
-                  (smtpmail-smtp-server . "esp01.zyner.net")
-                  (smtpmail-smtp-service . 465)
-                  (smtpmail-stream-type . ssl)))))
+	(list
+	 (make-mu4e-context
+	  :name "Private"
+	  :match-func
+	  (lambda (msg)
+	    (when msg
+	      (string-prefix-p "/" (mu4e-message-field msg :maildir))))
+	  :vars '((user-mail-address . "mg433@kimane.se")
+		  (user-full-name    . "Karl Elis Odenhage")
+		  (mu4e-drafts-folder  . "/Drafts")
+		  (mu4e-sent-folder  . "/Sent Mail")
+		  (mu4e-refile-folder  . "/All Mail")
+		  (mu4e-trash-folder  . "/Trash")
+		  (smtpmail-smtp-server . "mail.kimane.se")
+		  (smtpmail-smtp-service . 465)
+		  (smtpmail-stream-type . ssl)))))
 
   (defun remove-nth-element (nth list)
     (if (zerop nth) (cdr list)
       (let ((last (nthcdr (1- nth) list)))
-        (setcdr last (cddr last))
-        list)))
+	(setcdr last (cddr last))
+	list)))
   (setq mu4e-marks (remove-nth-element 5 mu4e-marks))
   (add-to-list 'mu4e-marks
-               '(trash
-                 :char ("d" . "▼")
-                 :prompt "dtrash"
-                 :dyn-target (lambda (target msg) (mu4e-get-trash-folder msg))
-                 :action (lambda (docid msg target)
-                           (mu4e~proc-move docid
-                                           (mu4e~mark-check-target target) "-N"))))
+	       '(trash
+		 :char ("d" . "▼")
+		 :prompt "dtrash"
+		 :dyn-target (lambda (target msg) (mu4e-get-trash-folder msg))
+		 :action (lambda (docid msg target)
+			   (mu4e~proc-move docid
+					   (mu4e~mark-check-target target) "-N"))))
 
   (setq message-send-mail-function 'smtpmail-send-it)
   (setq mu4e-compose-signature "- mg433")
@@ -431,11 +494,11 @@
   (setq mail-user-agent 'mu4e-user-agent)
 
   (setq mu4e-maildir-shortcuts
-        '(("/Inbox"     . ?i)
-          ("/Sent Mail" . ?s)
-          ("/Trash"     . ?t)
-          ("/Drafts"    . ?d)
-          ("/All Mail"  . ?a))))
+	'(("/Inbox"     . ?i)
+	  ("/Sent Mail" . ?s)
+	  ("/Trash"     . ?t)
+	  ("/Drafts"    . ?d)
+	  ("/All Mail"  . ?a))))
 
 (setq keo/mu4e-inbox-query
       "maildir:/Inbox AND flag:unread")
@@ -466,6 +529,7 @@
 (use-package password-store)
 
 (use-package auth-source
+  :ensure nil
   :config
   (setq auth-source '(password-store)))
 
@@ -527,22 +591,91 @@
   :config
   (setq org-ellipsis " ▾")
 
+  ;; Org notes directory
+  (setq org-default-notes-file "~/Org/capture.org")
+
+  ;; Org Agenda Files Location
+  (setq org-agenda-files '("~/Org/refile"
+                           "~/Org/notes/lists"
+                           "~/Org/notes/articles"
+                           "~/Org/notes/reference")) ;; - Used for the entire directory.
+  ;; Org Agenda Log Mode
   (setq org-agenda-start-with-log-mode t)
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
 
-  (setq org-agenda-files
-        '("~/OrgFiles/Calendar.org"))
 
-  (setq org-image-actual-width nil)
+  ;; Agenda Holidays
+  (setq org-agenda-include-diary t)
+  (setq calendar-christian-all-holidays-flag t)
+  (setq calendar-hebrew-all-holidays-flag t)
+  (setq calendar-islamic-all-holidays-flag t)
+  (setq holiday-general-holidays-flag t)
+  (setq holiday-other-holiday-flag t)
 
-  (require 'org-habit)
-  (add-to-list 'org-modules 'org-habit)
-  (setq org-habit-graph-column 60)
+  (setq holiday-bahai-holidays nil)
 
-  (setq org-todo-keywords
-        '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
-          (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
+  ;; Set Archive File
+  (setq org-archive-location (concat "~/Org/archives/archive-"(format-time-string "%Y" (current-time))".org::"))
+
+  ;; Save archive buffers when refile takes place
+  (advice-add 'org-refile :after 'org-save-all-org-buffers)
+
+  ;; org refile directory
+  ;;(setq org-refile-targets '((nil :maxlevel . 3)
+  ;;                           ("~/Org/refile/" :maxlevel . 3)))
+  (setq org-refile-targets '((org-agenda-files :maxlevel . 3)))
+
+  (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
+  (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
+  (setq org-archive-subtree-add-inherited-tags t) ;; Save inherited tags when archiving
+
+  (setq org-capture-templates '(
+
+                                ("t" "Todo" entry (file "~/Org/refile/inbox.org")"* TODO %?\n%U\n%a\n")
+
+                                ("b" "Bookmark" entry (file+headline "~/Org/refile/inbox.org" "Inbox") "** [[%:link][%:description]]\n")
+
+                                ("e" "Meeting" entry (file "~/Org/refile/inbox.org") "* MEETING with %? :MEETING:\n%t")
+
+                                ;; ("n" "Note" entry (file "~/Org/refile/inbox.org")"* %? :NOTE:\n%U\n%a\n")
+
+                                ("p" "Phone call" entry (file "~/Org/refile/inbox.org")"* PHONE %? :PHONE:\n%U")
+
+                                ;; ("r" "Cookbook" entry (file "~/org/cookbook.org")
+                                ;;  "%(org-chef-get-recipe-from-url)"
+                                ;;  :empty-lines 1)
+
+                                ;; ("o" "Manual Cookbook" entry (file "~/org/cookbook.org")
+                                ;;  "* %^{Recipe title: }\n  :PROPERTIES:\n  :source-url:\n  :servings:\n  :prep-time:\n  :cook-time:\n  :ready-in:\n  :END:\n** Ingredients\n   %?\n** Directions\n\n")
+
+                                ("C" "Protocol Link" entry (file+headline "~/Org/refile/inbox.org" "Inbox") "* %? [[%:link][%:description]]\n")
+
+                                ("w" "Protocol" entry (file+headline "~/Org/refile/inbox.org" "Inbox") "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+
+                                ;; Capture for Safari and Org-Protocol
+                                ("u" "URL capture from Safari" entry
+                                 (file+olp+datetree "~/Org/refile/inbox.org")
+                                 "* %i    \n%U\n\n")
+
+                                ;; Capture for Email
+                                ("m" "Email Workflow")
+                                ("mf" "Follow Up" entry (file+olp "~/Org/refile/email.org" "Follow Up")
+                                 "* TODO Follow up with %:fromname on %a\nSCHEDULED:%t\nDEADLINE: %(org-insert-time-stamp (org-read-date nil t \"+2d\"))\n%i" :immediate-finish t)
+                                ("mr" "Read Later" entry (file+olp "~/Org/refile/email.org" "Read Later")
+                                 "* TODO Read %:subject\nSCHEDULED:%t\nDEADLINE: %(org-insert-time-stamp (org-read-date nil t \"+2d\"))\n\n%a\n%i" :immediate-finish t)
+
+
+                                ))
+
+  ;; Allow org to refile to top level headers instead of existing headers only
+  ;; (setq org-refile-use-outline-path 'file) ;; Currently unused
+
+  ;; Allow org-refile to create parent header nodes
+  (setq org-refile-allow-creating-parent-nodes 'confirm)
+
+  ;; Org Download
+  ;; (require 'org-download)
   (keo/org-font-setup))
 
 (use-package org-bullets
@@ -569,7 +702,7 @@
 ;; Automatically tangle our Emacs.org config file when we save it
 (defun keo/org-babel-tangle-config ()
   (when (string-equal (file-name-directory (buffer-file-name))
-                      (expand-file-name "~/.dotfiles/"))
+                      (expand-file-name "~/.dotfiles/config/emacs/"))
     ;; Dynamic scoping to the rescue
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
@@ -994,8 +1127,18 @@
   :mode "\\.lua\\'"
   :hook (lua-mode . lsp-deferred))
 
+(use-package terraform-mode
+  :mode "\\.tf\\'")
+
 (use-package fennel-mode
   :mode "\\.fnl\\'")
+
+(use-package markdown-mode
+  :config
+  (setq markdown-command "pandoc"))
+
+(use-package simple-httpd
+  :ensure t)
 
 (use-package yasnippet
   :config
@@ -1035,3 +1178,6 @@
   (global-tempel-abbrev-mode)
 )
 (use-package tempel-collection)
+
+(use-package evil-nerd-commenter
+  :bind (("M-;" . evilnc-comment-or-uncomment-lines)))

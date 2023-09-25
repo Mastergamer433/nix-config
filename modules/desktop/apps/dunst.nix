@@ -19,9 +19,10 @@ in {
         };
 
         block_spotify = {
-          app_name = "spotify";
+          appname = "spotify";
           format = "";
         };
+        
 
         base16_low = {
           msg_urgency = "low";
